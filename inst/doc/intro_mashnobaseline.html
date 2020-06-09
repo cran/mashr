@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<meta name="author" content="Yuxin Zou" />
+
+<meta name="date" content="2020-06-04" />
+
+<title>mashr with no common baseline</title>
+
+
+
+<style type="text/css">code{white-space: pre;}</style>
+<style type="text/css" data-origin="pandoc">
+a.sourceLine { display: inline-block; line-height: 1.25; }
+a.sourceLine { pointer-events: none; color: inherit; text-decoration: inherit; }
+a.sourceLine:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode { white-space: pre; position: relative; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+code.sourceCode { white-space: pre-wrap; }
+a.sourceLine { text-indent: -1em; padding-left: 1em; }
+}
+pre.numberSource a.sourceLine
+  { position: relative; left: -4em; }
+pre.numberSource a.sourceLine::before
+  { content: attr(data-line-number);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; pointer-events: all; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {  }
+@media screen {
+a.sourceLine::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #7d9029; } /* Attribute */
+code span.bn { color: #40a070; } /* BaseN */
+code span.bu { } /* BuiltIn */
+code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4070a0; } /* Char */
+code span.cn { color: #880000; } /* Constant */
+code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code span.dt { color: #902000; } /* DataType */
+code span.dv { color: #40a070; } /* DecVal */
+code span.er { color: #ff0000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #40a070; } /* Float */
+code span.fu { color: #06287e; } /* Function */
+code span.im { } /* Import */
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code span.op { color: #666666; } /* Operator */
+code span.ot { color: #007020; } /* Other */
+code span.pp { color: #bc7a00; } /* Preprocessor */
+code span.sc { color: #4070a0; } /* SpecialChar */
+code span.ss { color: #bb6688; } /* SpecialString */
+code span.st { color: #4070a0; } /* String */
+code span.va { color: #19177c; } /* Variable */
+code span.vs { color: #4070a0; } /* VerbatimString */
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+
+</style>
+<script>
+// apply pandoc div.sourceCode style to pre.sourceCode instead
+(function() {
+  var sheets = document.styleSheets;
+  for (var i = 0; i < sheets.length; i++) {
+    if (sheets[i].ownerNode.dataset["origin"] !== "pandoc") continue;
+    try { var rules = sheets[i].cssRules; } catch (e) { continue; }
+    for (var j = 0; j < rules.length; j++) {
+      var rule = rules[j];
+      // check if there is a div.sourceCode rule
+      if (rule.type !== rule.STYLE_RULE || rule.selectorText !== "div.sourceCode") continue;
+      var style = rule.style.cssText;
+      // check if color or background-color is set
+      if (rule.style.color === '' && rule.style.backgroundColor === '') continue;
+      // replace div.sourceCode by a pre.sourceCode rule
+      sheets[i].deleteRule(j);
+      sheets[i].insertRule('pre.sourceCode{' + style + '}', j);
+    }
+  }
+})();
+</script>
+
+
+
+<style type="text/css">body {
+background-color: #fff;
+margin: 1em auto;
+max-width: 700px;
+overflow: visible;
+padding-left: 2em;
+padding-right: 2em;
+font-family: "Open Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
+font-size: 14px;
+line-height: 1.35;
+}
+#header {
+text-align: center;
+}
+#TOC {
+clear: both;
+margin: 0 0 10px 10px;
+padding: 4px;
+width: 400px;
+border: 1px solid #CCCCCC;
+border-radius: 5px;
+background-color: #f6f6f6;
+font-size: 13px;
+line-height: 1.3;
+}
+#TOC .toctitle {
+font-weight: bold;
+font-size: 15px;
+margin-left: 5px;
+}
+#TOC ul {
+padding-left: 40px;
+margin-left: -1.5em;
+margin-top: 5px;
+margin-bottom: 5px;
+}
+#TOC ul ul {
+margin-left: -2em;
+}
+#TOC li {
+line-height: 16px;
+}
+table {
+margin: 1em auto;
+border-width: 1px;
+border-color: #DDDDDD;
+border-style: outset;
+border-collapse: collapse;
+}
+table th {
+border-width: 2px;
+padding: 5px;
+border-style: inset;
+}
+table td {
+border-width: 1px;
+border-style: inset;
+line-height: 18px;
+padding: 5px 5px;
+}
+table, table th, table td {
+border-left-style: none;
+border-right-style: none;
+}
+table thead, table tr.even {
+background-color: #f7f7f7;
+}
+p {
+margin: 0.5em 0;
+}
+blockquote {
+background-color: #f6f6f6;
+padding: 0.25em 0.75em;
+}
+hr {
+border-style: solid;
+border: none;
+border-top: 1px solid #777;
+margin: 28px 0;
+}
+dl {
+margin-left: 0;
+}
+dl dd {
+margin-bottom: 13px;
+margin-left: 13px;
+}
+dl dt {
+font-weight: bold;
+}
+ul {
+margin-top: 0;
+}
+ul li {
+list-style: circle outside;
+}
+ul ul {
+margin-bottom: 0;
+}
+pre, code {
+background-color: #f7f7f7;
+border-radius: 3px;
+color: #333;
+white-space: pre-wrap; 
+}
+pre {
+border-radius: 3px;
+margin: 5px 0px 10px 0px;
+padding: 10px;
+}
+pre:not([class]) {
+background-color: #f7f7f7;
+}
+code {
+font-family: Consolas, Monaco, 'Courier New', monospace;
+font-size: 85%;
+}
+p > code, li > code {
+padding: 2px 0px;
+}
+div.figure {
+text-align: center;
+}
+img {
+background-color: #FFFFFF;
+padding: 2px;
+border: 1px solid #DDDDDD;
+border-radius: 3px;
+border: 1px solid #CCCCCC;
+margin: 0 5px;
+}
+h1 {
+margin-top: 0;
+font-size: 35px;
+line-height: 40px;
+}
+h2 {
+border-bottom: 4px solid #f7f7f7;
+padding-top: 10px;
+padding-bottom: 2px;
+font-size: 145%;
+}
+h3 {
+border-bottom: 2px solid #f7f7f7;
+padding-top: 10px;
+font-size: 120%;
+}
+h4 {
+border-bottom: 1px solid #f7f7f7;
+margin-left: 8px;
+font-size: 105%;
+}
+h5, h6 {
+border-bottom: 1px solid #ccc;
+font-size: 105%;
+}
+a {
+color: #0033dd;
+text-decoration: none;
+}
+a:hover {
+color: #6666ff; }
+a:visited {
+color: #800080; }
+a:visited:hover {
+color: #BB00BB; }
+a[href^="http:"] {
+text-decoration: underline; }
+a[href^="https:"] {
+text-decoration: underline; }
+
+code > span.kw { color: #555; font-weight: bold; } 
+code > span.dt { color: #902000; } 
+code > span.dv { color: #40a070; } 
+code > span.bn { color: #d14; } 
+code > span.fl { color: #d14; } 
+code > span.ch { color: #d14; } 
+code > span.st { color: #d14; } 
+code > span.co { color: #888888; font-style: italic; } 
+code > span.ot { color: #007020; } 
+code > span.al { color: #ff0000; font-weight: bold; } 
+code > span.fu { color: #900; font-weight: bold; }  code > span.er { color: #a61717; background-color: #e3d2d2; } 
+</style>
+
+
+
+
+</head>
+
+<body>
+
+
+
+
+<h1 class="title toc-ignore">mashr with no common baseline</h1>
+<h4 class="author">Yuxin Zou</h4>
+<h4 class="date">2020-06-04</h4>
+
+
+
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb1-1" data-line-number="1"><span class="kw">library</span>(MASS)</a>
+<a class="sourceLine" id="cb1-2" data-line-number="2"><span class="kw">library</span>(kableExtra)</a></code></pre></div>
+<div id="introduction" class="section level1">
+<h1>Introduction</h1>
+<p>In the previous vignette <a href="intro_mashcommonbaseline.html">mash common baseline</a>, we estimate the change in some quantity computed in multiple conditions over a <strong>common</strong> control condition. However, there might be no <strong>common</strong> control condition in a study. In this case, we define the reference condition as the mean over different conditions. Deviation in any condition is defined as a difference in the quantity over the mean. We want to estimate the change in some quantity computed in multiple conditions over their mean.</p>
+<p>For example, we measure the gene expression under multiple conditions. We want to estimate the change in expression in multiple conditions over their mean.</p>
+<p>As in the mash common baseline vignette, we include the additional burden of comparing all conditions to the same reference condition. To deal with these additional correlations, mashr allows the user to specify the reference condition using <code>mash_update_data</code> with <code>ref = 'mean'</code>, after setting up the data in <code>mash_set_data</code>.</p>
+</div>
+<div id="illustration" class="section level1">
+<h1>Illustration</h1>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb2-1" data-line-number="1">generate_data =<span class="st"> </span><span class="cf">function</span>(n, p, V, Utrue, <span class="dt">err_sd=</span><span class="fl">0.01</span>, <span class="dt">pi=</span><span class="ot">NULL</span>){</a>
+<a class="sourceLine" id="cb2-2" data-line-number="2">  <span class="cf">if</span> (<span class="kw">is.null</span>(pi)) {</a>
+<a class="sourceLine" id="cb2-3" data-line-number="3">    pi =<span class="st"> </span><span class="kw">rep</span>(<span class="dv">1</span>, <span class="kw">length</span>(Utrue)) <span class="co"># default to uniform distribution</span></a>
+<a class="sourceLine" id="cb2-4" data-line-number="4">  }</a>
+<a class="sourceLine" id="cb2-5" data-line-number="5">  assertthat<span class="op">::</span><span class="kw">are_equal</span>(<span class="kw">length</span>(pi), <span class="kw">length</span>(Utrue))</a>
+<a class="sourceLine" id="cb2-6" data-line-number="6"></a>
+<a class="sourceLine" id="cb2-7" data-line-number="7">  <span class="cf">for</span> (j <span class="cf">in</span> <span class="dv">1</span><span class="op">:</span><span class="kw">length</span>(Utrue)) {</a>
+<a class="sourceLine" id="cb2-8" data-line-number="8">    assertthat<span class="op">::</span><span class="kw">are_equal</span>(<span class="kw">dim</span>(Utrue[j]), <span class="kw">c</span>(p, p))</a>
+<a class="sourceLine" id="cb2-9" data-line-number="9">  }</a>
+<a class="sourceLine" id="cb2-10" data-line-number="10"></a>
+<a class="sourceLine" id="cb2-11" data-line-number="11">  pi &lt;-<span class="st"> </span>pi <span class="op">/</span><span class="st"> </span><span class="kw">sum</span>(pi) <span class="co"># normalize pi to sum to one</span></a>
+<a class="sourceLine" id="cb2-12" data-line-number="12">  which_U &lt;-<span class="st"> </span><span class="kw">sample</span>(<span class="dv">1</span><span class="op">:</span><span class="kw">length</span>(pi), n, <span class="dt">replace=</span><span class="ot">TRUE</span>, <span class="dt">prob=</span>pi)</a>
+<a class="sourceLine" id="cb2-13" data-line-number="13"></a>
+<a class="sourceLine" id="cb2-14" data-line-number="14">  Beta =<span class="st"> </span><span class="kw">matrix</span>(<span class="dv">0</span>, <span class="dt">nrow=</span>n, <span class="dt">ncol=</span>p)</a>
+<a class="sourceLine" id="cb2-15" data-line-number="15">  <span class="cf">for</span>(i <span class="cf">in</span> <span class="dv">1</span><span class="op">:</span>n){</a>
+<a class="sourceLine" id="cb2-16" data-line-number="16">    Beta[i,] =<span class="st"> </span><span class="kw">mvrnorm</span>(<span class="dv">1</span>, <span class="kw">rep</span>(<span class="dv">0</span>, p), Utrue[[which_U[i]]])</a>
+<a class="sourceLine" id="cb2-17" data-line-number="17">  }</a>
+<a class="sourceLine" id="cb2-18" data-line-number="18">  Shat =<span class="st"> </span><span class="kw">matrix</span>(err_sd, <span class="dt">nrow=</span>n, <span class="dt">ncol=</span>p, <span class="dt">byrow =</span> <span class="ot">TRUE</span>)</a>
+<a class="sourceLine" id="cb2-19" data-line-number="19">  E =<span class="st"> </span><span class="kw">mvrnorm</span>(n, <span class="kw">rep</span>(<span class="dv">0</span>, p), Shat[<span class="dv">1</span>,]<span class="op">^</span><span class="dv">2</span> <span class="op">*</span><span class="st"> </span>V)</a>
+<a class="sourceLine" id="cb2-20" data-line-number="20">  Bhat =<span class="st"> </span>Beta <span class="op">+</span><span class="st"> </span>E</a>
+<a class="sourceLine" id="cb2-21" data-line-number="21">  <span class="kw">return</span>(<span class="kw">list</span>(<span class="dt">B =</span> Beta, <span class="dt">Bhat=</span>Bhat, <span class="dt">Shat =</span> Shat, <span class="dt">whichU =</span> which_U))</a>
+<a class="sourceLine" id="cb2-22" data-line-number="22">}</a></code></pre></div>
+<p>Here we simulate data for illustration. This simulation routine creates a dataset with 5 conditions and 2000 samples. Half of the samples have equal expression among conditions. In the rest samples, half have higher and equal expression in the first 2 conditions, half have higher expression in the last condition.</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb3-1" data-line-number="1"><span class="kw">set.seed</span>(<span class="dv">1</span>)</a>
+<a class="sourceLine" id="cb3-2" data-line-number="2">n =<span class="st"> </span><span class="dv">2000</span></a>
+<a class="sourceLine" id="cb3-3" data-line-number="3">R =<span class="st"> </span><span class="dv">5</span></a>
+<a class="sourceLine" id="cb3-4" data-line-number="4">V =<span class="st"> </span><span class="kw">diag</span>(R)</a>
+<a class="sourceLine" id="cb3-5" data-line-number="5">U0 =<span class="st"> </span><span class="kw">matrix</span>(<span class="dv">0</span>, R, R)</a>
+<a class="sourceLine" id="cb3-6" data-line-number="6">U1 =<span class="st"> </span><span class="kw">matrix</span>(<span class="dv">1</span>, R, R)</a>
+<a class="sourceLine" id="cb3-7" data-line-number="7">U2 =<span class="st"> </span>U0; U2[<span class="dv">1</span><span class="op">:</span><span class="dv">2</span>,<span class="dv">1</span><span class="op">:</span><span class="dv">2</span>] =<span class="st"> </span><span class="dv">4</span></a>
+<a class="sourceLine" id="cb3-8" data-line-number="8">U3 =<span class="st"> </span>U0; U3[<span class="dv">5</span>,<span class="dv">5</span>] =<span class="st"> </span><span class="dv">4</span></a>
+<a class="sourceLine" id="cb3-9" data-line-number="9">simdata =<span class="st"> </span><span class="kw">generate_data</span>(n, R, V, <span class="kw">list</span>(<span class="dt">U0=</span>U0, <span class="dt">U1=</span>U1, <span class="dt">U2=</span>U2, <span class="dt">U3 =</span> U3), <span class="dt">err_sd =</span> <span class="dv">1</span>)</a></code></pre></div>
+<ol style="list-style-type: decimal">
+<li>Read in the data, and set the reference condition as mean</li>
+</ol>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb4-1" data-line-number="1"><span class="kw">library</span>(mashr)</a>
+<a class="sourceLine" id="cb4-2" data-line-number="2">data =<span class="st"> </span><span class="kw">mash_set_data</span>(simdata<span class="op">$</span>Bhat, simdata<span class="op">$</span>Shat)</a>
+<a class="sourceLine" id="cb4-3" data-line-number="3"></a>
+<a class="sourceLine" id="cb4-4" data-line-number="4">data.L =<span class="st"> </span><span class="kw">mash_update_data</span>(data, <span class="dt">ref =</span> <span class="st">'mean'</span>)</a></code></pre></div>
+<p>The updated mash data object (data.L) includes the induced correlation internally.</p>
+<ol start="2" style="list-style-type: decimal">
+<li>We proceed the analysis using the simple canonical covariances as in the <a href="intro_mash.html">initial introductory</a> vignette, and the data driven covariances as in the <a href="intro_mash_dd.html">Introduction to mash: data-driven covariances</a>.</li>
+</ol>
+<ul>
+<li>Canonical covariances</li>
+</ul>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb5-1" data-line-number="1">U.c =<span class="st"> </span><span class="kw">cov_canonical</span>(data.L)</a></code></pre></div>
+<ul>
+<li>Data-driven covariances</li>
+</ul>
+<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb6-1" data-line-number="1">m<span class="fl">.1</span>by1 =<span class="st"> </span><span class="kw">mash_1by1</span>(data.L)</a>
+<a class="sourceLine" id="cb6-2" data-line-number="2">strong =<span class="st"> </span><span class="kw">get_significant_results</span>(m<span class="fl">.1</span>by1)</a>
+<a class="sourceLine" id="cb6-3" data-line-number="3">U.pca =<span class="st"> </span><span class="kw">cov_pca</span>(data.L,<span class="dv">2</span>,<span class="dt">subset=</span>strong)</a>
+<a class="sourceLine" id="cb6-4" data-line-number="4">U.ed =<span class="st"> </span><span class="kw">cov_ed</span>(data.L, U.pca, <span class="dt">subset=</span>strong)</a></code></pre></div>
+<ol start="3" style="list-style-type: decimal">
+<li>Fit mash model</li>
+</ol>
+<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb7-1" data-line-number="1">m =<span class="st"> </span><span class="kw">mash</span>(data.L, <span class="kw">c</span>(U.c,U.ed), <span class="dt">algorithm.version =</span> <span class="st">'R'</span>)</a></code></pre></div>
+<pre><code>#  - Computing 2000 x 181 likelihood matrix.
+#  - Likelihood calculations took 0.10 seconds.
+#  - Fitting model with 181 mixture components.
+#  - Model fitting took 0.84 seconds.
+#  - Computing posterior matrices.
+#  - Computation allocated took 0.01 seconds.</code></pre>
+<p>The log likelihood is</p>
+<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb9-1" data-line-number="1"><span class="kw">print</span>(<span class="kw">get_loglik</span>(m),<span class="dt">digits=</span><span class="dv">10</span>)</a></code></pre></div>
+<pre><code># [1] -10891.72213</code></pre>
+<p>Use <code>get_significant_results</code> to find the indices of effects that are ‘significant’:</p>
+<div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb11-1" data-line-number="1"><span class="kw">length</span>(<span class="kw">get_significant_results</span>(m))</a></code></pre></div>
+<pre><code># [1] 141</code></pre>
+<p>The number of false positive is 1.</p>
+</div>
+
+
+
+<!-- code folding -->
+
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>
