@@ -99,11 +99,24 @@ connected to Internet while running these commands):
    uncrustify -c uncrustify_default.cfg --replace --no-backup -l CPP mash.cpp
    ```
 
++ To load the package into R without recompiling the Rcpp attributes,
+run `pkgbuild::compile_dll(compile_attributes = FALSE)`, then run
+`devtools::load_all()`.
+
 + Prior to submitting the package to CRAN, the following modifications
 need to be made: (1) remove the `Remotes:` entry in `DESCRIPTION`; (2)
 remove the `flash_mash.Rmd` vignette; (3) remove "flashr" from
 `Suggests:` in `DESCRIPTION`; (4) Make sure version number is of the
 form x.y.z.
+
++ For one of the Solaris computing environments, `rhub::check(platform
+= "solaris-x86-patched-ods")`, we encountered an
+[RcppGSL linking issue][rcppgsl-issue], probably due to symbols that
+were inappropriately defined in one of the RcppGSL headers. A
+workaround for this linking issue is to remove `#include <RcppGSL.h>`
+from `RcppExports.cpp`, and move any RcppGSL-related function
+definitions to `extreme_deconvolution.cpp`. For an example of what
+this looks like, see commit 4a41f14.
 
 [mashr-pkg-for-paper]: http://github.com/stephenslab/mashr-paper
 [cran-docs]: https://cran.r-project.org/manuals.html
@@ -115,3 +128,4 @@ form x.y.z.
 [vignette-data-driven-cov]: https://stephenslab.github.io/mashr/articles/intro_mash_dd.html
 [vignette-non-canonical]: https://stephenslab.github.io/mashr/articles/simulate_noncanon.html
 [uncrustify]: http://uncrustify.sourceforge.net
+[rcppgsl-issue]: https://github.com/eddelbuettel/rcppgsl/issues/25

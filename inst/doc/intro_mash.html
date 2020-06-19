@@ -12,7 +12,7 @@
 
 <meta name="author" content="Matthew Stephens" />
 
-<meta name="date" content="2020-06-04" />
+<meta name="date" content="2020-06-17" />
 
 <title>Introduction to mashr</title>
 
@@ -303,7 +303,7 @@ code > span.fu { color: #900; font-weight: bold; }  code > span.er { color: #a61
 
 <h1 class="title toc-ignore">Introduction to mashr</h1>
 <h4 class="author">Matthew Stephens</h4>
-<h4 class="date">2020-06-04</h4>
+<h4 class="date">2020-06-17</h4>
 
 
 
@@ -360,7 +360,7 @@ code > span.fu { color: #900; font-weight: bold; }  code > span.er { color: #a61
 <pre><code>#  - Computing 2000 x 151 likelihood matrix.
 #  - Likelihood calculations took 0.04 seconds.
 #  - Fitting model with 151 mixture components.
-#  - Model fitting took 0.54 seconds.
+#  - Model fitting took 0.56 seconds.
 #  - Computing posterior matrices.
 #  - Computation allocated took 0.01 seconds.</code></pre>
 <p>This can take a little time. What this does is to fit a mixture model to the data, estimating the mixture proportions. Specifically the model is that the true effects follow a mixture of multivariate normal distributions: <span class="math inline">\(B \sim \sum_k \sum_l \pi_{kl} N(0, \omega_l U_k)\)</span> where the <span class="math inline">\(\omega_l\)</span> are scaling factors set by the “grid” parameter in <code>mash</code> and the <span class="math inline">\(U_k\)</span> are the covariance matrices (here specified by <code>U.c</code>).</p>
@@ -455,7 +455,7 @@ code > span.fu { color: #900; font-weight: bold; }  code > span.er { color: #a61
 <div class="sourceCode" id="cb29"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb29-1" data-line-number="1"><span class="kw">print</span>(<span class="kw">sessionInfo</span>())</a></code></pre></div>
 <pre><code># R version 3.6.2 (2019-12-12)
 # Platform: x86_64-apple-darwin15.6.0 (64-bit)
-# Running under: macOS Catalina 10.15.4
+# Running under: macOS Catalina 10.15.5
 # 
 # Matrix products: default
 # BLAS:   /Library/Frameworks/R.framework/Versions/3.6/Resources/lib/libRblas.0.dylib
@@ -468,7 +468,7 @@ code > span.fu { color: #900; font-weight: bold; }  code > span.er { color: #a61
 # [1] stats     graphics  grDevices utils     datasets  methods   base     
 # 
 # other attached packages:
-# [1] mashr_0.2.28 ashr_2.2-50 
+# [1] mashr_0.2.38 ashr_2.2-50 
 # 
 # loaded via a namespace (and not attached):
 #  [1] Rcpp_1.0.3        knitr_1.26        magrittr_1.5      SQUAREM_2017.10-1

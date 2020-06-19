@@ -12,7 +12,7 @@
 
 <meta name="author" content="Matthew Stephens" />
 
-<meta name="date" content="2020-06-04" />
+<meta name="date" content="2020-06-17" />
 
 <title>Accounting for correlations among measurements</title>
 
@@ -303,7 +303,7 @@ code > span.fu { color: #900; font-weight: bold; }  code > span.er { color: #a61
 
 <h1 class="title toc-ignore">Accounting for correlations among measurements</h1>
 <h4 class="author">Matthew Stephens</h4>
-<h4 class="date">2020-06-04</h4>
+<h4 class="date">2020-06-17</h4>
 
 
 
@@ -329,11 +329,11 @@ code > span.fu { color: #900; font-weight: bold; }  code > span.er { color: #a61
 <div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb3-1" data-line-number="1">U.c =<span class="st"> </span><span class="kw">cov_canonical</span>(data.V) </a>
 <a class="sourceLine" id="cb3-2" data-line-number="2">m.c =<span class="st"> </span><span class="kw">mash</span>(data.V, U.c) <span class="co"># fits with correlations because data.V includes correlation information </span></a></code></pre></div>
 <pre><code>#  - Computing 2000 x 151 likelihood matrix.
-#  - Likelihood calculations took 0.05 seconds.
+#  - Likelihood calculations took 0.04 seconds.
 #  - Fitting model with 151 mixture components.
-#  - Model fitting took 0.54 seconds.
+#  - Model fitting took 0.59 seconds.
 #  - Computing posterior matrices.
-#  - Computation allocated took 0.02 seconds.</code></pre>
+#  - Computation allocated took 0.01 seconds.</code></pre>
 <div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb5-1" data-line-number="1"><span class="kw">print</span>(<span class="kw">get_loglik</span>(m.c),<span class="dt">digits=</span><span class="dv">10</span>) <span class="co"># log-likelihood of the fit with correlations set to V</span></a></code></pre></div>
 <pre><code># [1] -16121.11177</code></pre>
 <p>We can also compare with the original analysis. (Note that the canonical covariances do not depend on the correlations, so we can use the same <code>U.c</code> here for both analyses. If we used data-driven covariances we might prefer to estimate these separately for each analysis as the correlations would affect them.)</p>
@@ -341,7 +341,7 @@ code > span.fu { color: #900; font-weight: bold; }  code > span.er { color: #a61
 <pre><code>#  - Computing 2000 x 151 likelihood matrix.
 #  - Likelihood calculations took 0.04 seconds.
 #  - Fitting model with 151 mixture components.
-#  - Model fitting took 0.57 seconds.
+#  - Model fitting took 0.63 seconds.
 #  - Computing posterior matrices.
 #  - Computation allocated took 0.02 seconds.</code></pre>
 <div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb9-1" data-line-number="1"><span class="kw">print</span>(<span class="kw">get_loglik</span>(m.c.orig),<span class="dt">digits=</span><span class="dv">10</span>)</a></code></pre></div>

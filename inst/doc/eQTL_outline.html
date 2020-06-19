@@ -12,7 +12,7 @@
 
 <meta name="author" content="Matthew Stephens" />
 
-<meta name="date" content="2020-06-04" />
+<meta name="date" content="2020-06-17" />
 
 <title>eQTL analysis outline</title>
 
@@ -303,7 +303,7 @@ code > span.fu { color: #900; font-weight: bold; }  code > span.er { color: #a61
 
 <h1 class="title toc-ignore">eQTL analysis outline</h1>
 <h4 class="author">Matthew Stephens</h4>
-<h4 class="date">2020-06-04</h4>
+<h4 class="date">2020-06-17</h4>
 
 
 
@@ -366,9 +366,9 @@ code > span.fu { color: #900; font-weight: bold; }  code > span.er { color: #a61
 <div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb5-1" data-line-number="1">U.c =<span class="st"> </span><span class="kw">cov_canonical</span>(data.random)</a>
 <a class="sourceLine" id="cb5-2" data-line-number="2">m =<span class="st"> </span><span class="kw">mash</span>(data.random, <span class="dt">Ulist =</span> <span class="kw">c</span>(U.ed,U.c), <span class="dt">outputlevel =</span> <span class="dv">1</span>)</a></code></pre></div>
 <pre><code>#  - Computing 5000 x 241 likelihood matrix.
-#  - Likelihood calculations took 0.17 seconds.
+#  - Likelihood calculations took 0.20 seconds.
 #  - Fitting model with 241 mixture components.
-#  - Model fitting took 3.76 seconds.</code></pre>
+#  - Model fitting took 4.23 seconds.</code></pre>
 </div>
 <div id="compute-posterior-summaries" class="section level2">
 <h2>Compute posterior summaries</h2>
@@ -378,7 +378,7 @@ code > span.fu { color: #900; font-weight: bold; }  code > span.er { color: #a61
 <pre><code>#  - Computing 1428 x 241 likelihood matrix.
 #  - Likelihood calculations took 0.05 seconds.
 #  - Computing posterior matrices.
-#  - Computation allocated took 0.02 seconds.</code></pre>
+#  - Computation allocated took 0.01 seconds.</code></pre>
 <div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb9-1" data-line-number="1"><span class="kw">head</span>(<span class="kw">get_lfsr</span>(m2))</a></code></pre></div>
 <pre><code>#               condition_1  condition_2  condition_3  condition_4  condition_5
 # effect_13096 9.837638e-06 5.072688e-01 4.242991e-01 3.957421e-01 6.073757e-01
