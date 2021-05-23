@@ -1,5 +1,6 @@
 # mashr: Multivariate Adaptive Shrinkage in R
 
+[![CRAN\_Status\_Badge](https://www.r-pkg.org/badges/version/mashr)](https://cran.r-project.org/package=mashr)
 [![Travis Build Status](https://travis-ci.org/stephenslab/mashr.svg?branch=master)](https://travis-ci.org/stephenslab/mashr)
 [![codecov](https://codecov.io/gh/stephenslab/mashr/branch/master/graph/badge.svg)](https://codecov.io/gh/stephenslab/mashr)
 
@@ -16,7 +17,8 @@ is [here][mashr-pkg-for-paper].
 
 ## Quick Start
 
-1. Follow the setup instructions below.
+1. Install mashr from CRAN: `install.packages("mashr")`. For more
+detailed setup instructions, see below.
 
 2. See the [introductory vignette][vignette-intro] for an
 introduction to mashr.
@@ -27,7 +29,7 @@ and [Simulation with non-canonical matrices][vignette-non-canonical].
 
 ## Citing this work
 
-If you find the masr package or any of the source code in this
+If you find the mashr package or any of the source code in this
 repository useful for your work, please cite:
 
 > Sarah Urbut, Gao Wang, Peter Carbonetto and Matthew Stephens
@@ -36,45 +38,32 @@ repository useful for your work, please cite:
 
 ## Setup
 
-Please follow these steps to install mashr.
+The simplest and quickest to obtain mashr is to install it from
+[CRAN][mashr-cran]:
 
-1. Unlike most packages available on CRAN, mashr is not precompiled,
-   and therefore to install mashr you will need to make sure that your
-   R installation is properly set up to compile packages with C++
-   source; in particular, the C++ compiler programs supported by your
-   version of R should be installed on your computer, and R should be
-   correctly configured to call these compilers when installing
-   packages from source. For more information, see the
-   [CRAN documentation][cran-docs].
+```R
+install.packages("mashr")
+```
+
+For Mac and Windows, usually the package is precompiled, so no
+additional compiler setup is required. If you have Linux, and in some
+other rare cases, you will need to make sure that your R installation
+is properly set up to compile packages with C++ source; in particular,
+the C++ compiler programs supported by your version of R should be
+installed on your computer, and R should be correctly configured to
+call these compilers when installing packages from source. For more
+information, see the [CRAN documentation][cran-docs].
+
+Alternatively, you may use [remotes][remotes] to install the latest
+version of mashr from GitHub:
+
+```R
+install.packages("remotes")
+remotes::install_github("stephenslab/mashr")
+```
    
-2. Install the [latest release][mashr-release] of the mashr package
-   using [devtools][devtools]:
-
-    ```R
-    install.packages("devtools")
-    devtools::install_github("stephenslab/mashr@v0.2-11")
-    ```
-   
-   This command should automatically install any missing dependencies
-   that are available from CRAN. This command should also
-   automatically retrieve and install the latest version of the ashr
-   package from Github. If it does not, you can install the ashr
-   package separately using devtools:
-
-   ```R
-   devtools::install_github("stephens999/ashr")
-   ```
-   
-3. By default, the `devtools::install_github` function does not build
-   the vignettes. If you would like to build the vignettes as well,
-   you will need to several additional packages, including
-   [flashr][flashr], that are used only in the vignettes. This can
-   also be done with devtools:
-
-   ```R
-   devtools::install_github("stephenslab/mashr@v0.2-11",dependencies = TRUE,
-                            build_vignettes = TRUE)
-   ```
+This command should automatically install any missing dependencies
+that are available from CRAN and GitHub. 
 
 ## Developer notes
 
@@ -99,33 +88,18 @@ connected to Internet while running these commands):
    uncrustify -c uncrustify_default.cfg --replace --no-backup -l CPP mash.cpp
    ```
 
-+ To load the package into R without recompiling the Rcpp attributes,
-run `pkgbuild::compile_dll(compile_attributes = FALSE)`, then run
-`devtools::load_all()`.
-
 + Prior to submitting the package to CRAN, the following modifications
-need to be made: (1) remove the `Remotes:` entry in `DESCRIPTION`; (2)
-remove the `flash_mash.Rmd` vignette; (3) remove "flashr" from
-`Suggests:` in `DESCRIPTION`; (4) Make sure version number is of the
-form x.y.z.
+need to be made: (1) remove the `Remotes:` entry in `DESCRIPTION`; and
+(2) set `eval = FALSE` in the `flash_mash.Rmd` vignette.
 
-+ For one of the Solaris computing environments, `rhub::check(platform
-= "solaris-x86-patched-ods")`, we encountered an
-[RcppGSL linking issue][rcppgsl-issue], probably due to symbols that
-were inappropriately defined in one of the RcppGSL headers. A
-workaround for this linking issue is to remove `#include <RcppGSL.h>`
-from `RcppExports.cpp`, and move any RcppGSL-related function
-definitions to `extreme_deconvolution.cpp`. For an example of what
-this looks like, see commit 4a41f14.
-
-[mashr-pkg-for-paper]: http://github.com/stephenslab/mashr-paper
+[mashr-pkg-for-paper]: https://github.com/stephenslab/mashr-paper
 [cran-docs]: https://cran.r-project.org/manuals.html
 [mash-paper]: https://doi.org/10.1038/s41588-018-0268-8
 [mashr-release]: https://github.com/stephenslab/mashr/releases/tag/v0.2-11
-[devtools]: https://github.com/r-lib/devtools
+[remotes]: https://github.com/r-lib/remotes
 [flashr]: https://github.com/stephenslab/flashr
 [vignette-intro]: https://stephenslab.github.io/mashr/articles/intro_mash.html
 [vignette-data-driven-cov]: https://stephenslab.github.io/mashr/articles/intro_mash_dd.html
 [vignette-non-canonical]: https://stephenslab.github.io/mashr/articles/simulate_noncanon.html
 [uncrustify]: http://uncrustify.sourceforge.net
-[rcppgsl-issue]: https://github.com/eddelbuettel/rcppgsl/issues/25
+[mashr-cran]: https://cran.r-project.org/package=mashr

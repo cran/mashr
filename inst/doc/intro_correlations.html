@@ -8,11 +8,11 @@
 <meta name="generator" content="pandoc" />
 <meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
 
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1" />
 
 <meta name="author" content="Matthew Stephens" />
 
-<meta name="date" content="2020-06-17" />
+<meta name="date" content="2021-05-19" />
 
 <title>Accounting for correlations among measurements</title>
 
@@ -117,9 +117,6 @@ padding-right: 2em;
 font-family: "Open Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
 font-size: 14px;
 line-height: 1.35;
-}
-#header {
-text-align: center;
 }
 #TOC {
 clear: both;
@@ -288,7 +285,8 @@ code > span.st { color: #d14; }
 code > span.co { color: #888888; font-style: italic; } 
 code > span.ot { color: #007020; } 
 code > span.al { color: #ff0000; font-weight: bold; } 
-code > span.fu { color: #900; font-weight: bold; }  code > span.er { color: #a61717; background-color: #e3d2d2; } 
+code > span.fu { color: #900; font-weight: bold; } 
+code > span.er { color: #a61717; background-color: #e3d2d2; } 
 </style>
 
 
@@ -303,7 +301,7 @@ code > span.fu { color: #900; font-weight: bold; }  code > span.er { color: #a61
 
 <h1 class="title toc-ignore">Accounting for correlations among measurements</h1>
 <h4 class="author">Matthew Stephens</h4>
-<h4 class="date">2020-06-17</h4>
+<h4 class="date">2021-05-19</h4>
 
 
 
@@ -341,9 +339,9 @@ code > span.fu { color: #900; font-weight: bold; }  code > span.er { color: #a61
 <pre><code>#  - Computing 2000 x 151 likelihood matrix.
 #  - Likelihood calculations took 0.04 seconds.
 #  - Fitting model with 151 mixture components.
-#  - Model fitting took 0.63 seconds.
+#  - Model fitting took 0.65 seconds.
 #  - Computing posterior matrices.
-#  - Computation allocated took 0.02 seconds.</code></pre>
+#  - Computation allocated took 0.01 seconds.</code></pre>
 <div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb9-1" data-line-number="1"><span class="kw">print</span>(<span class="kw">get_loglik</span>(m.c.orig),<span class="dt">digits=</span><span class="dv">10</span>)</a></code></pre></div>
 <pre><code># [1] -16120.32142</code></pre>
 <p>The log-likelihoods with and without correlations are similar here, which is expected since there are no actual correlations in the data.</p>

@@ -10,11 +10,11 @@
 
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 
-<meta name="author" content="Matthew Stephens" />
+<meta name="author" content="Gao Wang" />
 
 <meta name="date" content="2021-05-19" />
 
-<title>eQTL analysis outline</title>
+<title>Empirical Bayes matrix factorization for data driven prior</title>
 
 
 
@@ -299,37 +299,19 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 
 
 
-<h1 class="title toc-ignore">eQTL analysis outline</h1>
-<h4 class="author">Matthew Stephens</h4>
+<h1 class="title toc-ignore">Empirical Bayes matrix factorization for data driven prior</h1>
+<h4 class="author">Gao Wang</h4>
 <h4 class="date">2021-05-19</h4>
 
 
 
 <div id="introduction" class="section level1">
 <h1>Introduction</h1>
-<p>In the introductory <code>mashr</code> vignettes we assumed that the data were small enough that it was convenient to read them all in and do all the analyses on the same data.</p>
-<p>In larger applications, particularly eQTL studies, it can be more convenient to do different parts of the analyses on subsets of the tests. Specifically, if you have millions of tests in dozens of conditions, it might be helpful to consider subsets of these millions of tests at any one time. Here we illustrate this idea.</p>
-<p>Our suggested workflow is to extract (at least) two subsets of tests from your complete data set:</p>
-<ol style="list-style-type: decimal">
-<li><p>Results from a subset of “strong” tests corresponding to stronger effects in your study. For example, these tests might have been identified by taking the “top” eQTL in each gene based on univariate test results, or by some other approach such as a simple meta-analysis.</p></li>
-<li><p>Results from a <em>random subset</em> of all tests. It is important that these be an unbiased representation of all the tests you are considering, including null and non-null tests, because <code>mashr</code> uses these tests to learn about the amount of signal in the data, and to “correct” estimates for the fact that many tests are null (analagous to a kind of multiple testing correction.)</p></li>
-</ol>
-<p>We will call the data from these two sets of tests <code>strong</code> and <code>random</code> respectively.</p>
-<p>To give some sense of the potential appropriate sizes of these datasets: in our eQTL application in <a href="https://www.biorxiv.org/content/10.1101/096552v2">Urbut et al</a>, the <code>strong</code> data contained about 16k tests (the top eQTL per gene), and for the <code>random</code> data we used 20k randomly-selected tests. (If you suspect true effects are very sparse then you might want to increase the size of the random subset, say to 200k).</p>
-<div id="analysis-strategy-outline" class="section level2">
-<h2>Analysis strategy outline</h2>
-<p>The basic analysis strategy is now:</p>
-<ol style="list-style-type: decimal">
-<li><p>Learn correlation structure among null tests using <code>random</code> test.</p></li>
-<li><p>Learn data-driven covariance matrices using <code>strong</code> tests.</p></li>
-<li><p>Fit the mashr model to the <code>random</code> tests, to learn the mixture weights on all the different covariance matrices and scaling coefficients.</p></li>
-<li><p>Compute posterior summaries on the <code>strong</code> tests, using the model fit from step 2. (At this stage you could actually compute posterior summaries for any sets of tests you like. For example you could read in all your tests in small batches and compute posterior summaries in batches. But for illustration we will just do it on the <code>strong</code> tests.)</p></li>
-</ol>
+<p>This is continuation of the <a href="https://stephenslab.github.io/mashr/articles/eQTL_outline.html">eQTL analysis vignette</a>. In that vignette we have used PCA to compute data driven covariances. Here we demonstrate the use of additional data driven covariance, via <a href="https://github.com/stephenslab/flashr">flash</a> decomposition.</p>
 </div>
-</div>
-<div id="example" class="section level1">
-<h1>Example</h1>
-<p>First we simulate some data to illustrate the ideas. To make this convenient to run we simulate a small data. And we identify the strong hits using <code>mash_1by1</code>. But in practice you may want to use methods outside of R to extract the matrices of data corresponding to strong and random tests, and then read them in as you need them. For example, see <a href="https://github.com/stephenslab/gtexresults/blob/master/workflows/fastqtl_to_mash.ipynb">here</a> for scripts we use for processing fastQTL output.</p>
+<div id="dataset-simulation" class="section level1">
+<h1>Dataset simulation</h1>
+<p>Same as the <a href="https://stephenslab.github.io/mashr/articles/eQTL_outline.html">eQTL analysis vignette</a> we simulate a toy data-set,</p>
 <div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb1-1" data-line-number="1"><span class="kw">library</span>(ashr)</a>
 <a class="sourceLine" id="cb1-2" data-line-number="2"><span class="kw">library</span>(mashr)</a>
 <a class="sourceLine" id="cb1-3" data-line-number="3"><span class="kw">set.seed</span>(<span class="dv">1</span>)</a>
@@ -341,51 +323,39 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 <a class="sourceLine" id="cb1-9" data-line-number="9"></a>
 <a class="sourceLine" id="cb1-10" data-line-number="10"><span class="co"># identify a random subset of 5000 tests</span></a>
 <a class="sourceLine" id="cb1-11" data-line-number="11">random.subset =<span class="st"> </span><span class="kw">sample</span>(<span class="dv">1</span><span class="op">:</span><span class="kw">nrow</span>(simdata<span class="op">$</span>Bhat),<span class="dv">5000</span>)</a></code></pre></div>
-<div id="correlation-structure" class="section level2">
-<h2>Correlation structure</h2>
-<p>We estimate the correlation structure in the null tests from the <code>random</code> data (not the <code>strong</code> data because they will not necessarily contain any null tests).</p>
-<p>To do this we set up a temporary data object <code>data.temp</code> from the random tests and use <code>estimate_null_correlation_simple</code> as in <a href="intro_correlations.html">this vignette</a>.</p>
+<p>and create <code>random</code> and <code>strong</code> sets,</p>
 <div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb2-1" data-line-number="1">data.temp =<span class="st"> </span><span class="kw">mash_set_data</span>(simdata<span class="op">$</span>Bhat[random.subset,],simdata<span class="op">$</span>Shat[random.subset,])</a>
 <a class="sourceLine" id="cb2-2" data-line-number="2">Vhat =<span class="st"> </span><span class="kw">estimate_null_correlation_simple</span>(data.temp)</a>
-<a class="sourceLine" id="cb2-3" data-line-number="3"><span class="kw">rm</span>(data.temp)</a></code></pre></div>
-<p>Now we can set up our main data objects with this correlation structure in place:</p>
-<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb3-1" data-line-number="1">data.random =<span class="st"> </span><span class="kw">mash_set_data</span>(simdata<span class="op">$</span>Bhat[random.subset,],simdata<span class="op">$</span>Shat[random.subset,],<span class="dt">V=</span>Vhat)</a>
-<a class="sourceLine" id="cb3-2" data-line-number="2">data.strong =<span class="st"> </span><span class="kw">mash_set_data</span>(simdata<span class="op">$</span>Bhat[strong.subset,],simdata<span class="op">$</span>Shat[strong.subset,], <span class="dt">V=</span>Vhat)</a></code></pre></div>
+<a class="sourceLine" id="cb2-3" data-line-number="3"><span class="kw">rm</span>(data.temp)</a>
+<a class="sourceLine" id="cb2-4" data-line-number="4">data.random =<span class="st"> </span><span class="kw">mash_set_data</span>(simdata<span class="op">$</span>Bhat[random.subset,],simdata<span class="op">$</span>Shat[random.subset,],<span class="dt">V=</span>Vhat)</a>
+<a class="sourceLine" id="cb2-5" data-line-number="5">data.strong =<span class="st"> </span><span class="kw">mash_set_data</span>(simdata<span class="op">$</span>Bhat[strong.subset,],simdata<span class="op">$</span>Shat[strong.subset,], <span class="dt">V=</span>Vhat)</a></code></pre></div>
 </div>
-<div id="data-driven-covariances" class="section level2">
-<h2>Data driven covariances</h2>
-<p>Now we use the strong tests to set up data-driven covariances.</p>
-<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb4-1" data-line-number="1">U.pca =<span class="st"> </span><span class="kw">cov_pca</span>(data.strong,<span class="dv">5</span>)</a>
-<a class="sourceLine" id="cb4-2" data-line-number="2">U.ed =<span class="st"> </span><span class="kw">cov_ed</span>(data.strong, U.pca)</a></code></pre></div>
+<div id="flash-analysis" class="section level1">
+<h1>FLASH analysis</h1>
+<p>We first perform the empirical Bayes matrix factorization via <code>flashr</code> using its default settings,</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb3-1" data-line-number="1">U.f =<span class="st"> </span><span class="kw">cov_flash</span>(data.strong)</a>
+<a class="sourceLine" id="cb3-2" data-line-number="2">U.f</a></code></pre></div>
+<p>Alternatively, as <a href="https://willwerscheid.github.io/MASHvFLASH/MASHvFLASHnn2.html">suggested by Jason Willwerscheid for multi-tissue QTL studies</a>, constrain factors to non-negative values. We can use <code>tag</code> parameter to customize the names in the output list:</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb4-1" data-line-number="1">U.f =<span class="st"> </span><span class="kw">cov_flash</span>(data.strong, <span class="dt">factors=</span><span class="st">&quot;nonneg&quot;</span>, <span class="dt">tag=</span><span class="st">&quot;non_neg&quot;</span>, <span class="dt">var_type=</span><span class="st">&quot;constant&quot;</span>)</a>
+<a class="sourceLine" id="cb4-2" data-line-number="2">U.f</a></code></pre></div>
+<p><code>var_type=&quot;constant&quot;</code> is an additional parameter passed to <code>flash</code> function, as suggested in the post above.</p>
 </div>
-<div id="fit-mash-model-estimate-mixture-proportions" class="section level2">
-<h2>Fit mash model (estimate mixture proportions)</h2>
-<p>Now we fit mash to the random tests using both data-driven and canonical covariances. (Remember the Crucial Rule! We have to fit using a random set of tests, and not a dataset that is enriched for strong tests.) The <code>outputlevel=1</code> option means that it will not compute posterior summaries for these tests (which saves time).</p>
-<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb5-1" data-line-number="1">U.c =<span class="st"> </span><span class="kw">cov_canonical</span>(data.random)</a>
-<a class="sourceLine" id="cb5-2" data-line-number="2">m =<span class="st"> </span><span class="kw">mash</span>(data.random, <span class="dt">Ulist =</span> <span class="kw">c</span>(U.ed,U.c), <span class="dt">outputlevel =</span> <span class="dv">1</span>)</a></code></pre></div>
-<pre><code>#  - Computing 5000 x 241 likelihood matrix.
-#  - Likelihood calculations took 0.17 seconds.
-#  - Fitting model with 241 mixture components.
-#  - Model fitting took 3.87 seconds.</code></pre>
+<div id="finalize-covariances" class="section level1">
+<h1>Finalize covariances</h1>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb5-1" data-line-number="1">U.pca =<span class="st"> </span><span class="kw">cov_pca</span>(data.strong, <span class="dv">5</span>)</a>
+<a class="sourceLine" id="cb5-2" data-line-number="2">U.ed =<span class="st"> </span><span class="kw">cov_ed</span>(data.strong, <span class="kw">c</span>(U.f, U.pca))</a>
+<a class="sourceLine" id="cb5-3" data-line-number="3">U.c =<span class="st"> </span><span class="kw">cov_canonical</span>(data.random)</a></code></pre></div>
 </div>
-<div id="compute-posterior-summaries" class="section level2">
-<h2>Compute posterior summaries</h2>
-<p>Now we can compute posterior summaries etc for any subset of tests using the above mash fit. Here we do this for the <code>strong</code> tests. We do this using the same <code>mash</code> function as above, but we specify to use the fit from the previous run of mash by specifying<br />
-<code>g=get_fitted_g(m), fixg=TRUE</code>. (In <code>mash</code> the parameter <code>g</code> is used to denote the mixture model which we learned above.)</p>
-<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb7-1" data-line-number="1">m2 =<span class="st"> </span><span class="kw">mash</span>(data.strong, <span class="dt">g=</span><span class="kw">get_fitted_g</span>(m), <span class="dt">fixg=</span><span class="ot">TRUE</span>)</a></code></pre></div>
-<pre><code>#  - Computing 1428 x 241 likelihood matrix.
-#  - Likelihood calculations took 0.04 seconds.
-#  - Computing posterior matrices.
-#  - Computation allocated took 0.02 seconds.</code></pre>
-<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb9-1" data-line-number="1"><span class="kw">head</span>(<span class="kw">get_lfsr</span>(m2))</a></code></pre></div>
-<pre><code>#               condition_1  condition_2  condition_3  condition_4  condition_5
-# effect_13096 9.815945e-06 5.056808e-01 4.229107e-01 3.944224e-01 6.055467e-01
-# effect_29826 6.571537e-05 6.637417e-01 5.837333e-01 6.358124e-01 5.768253e-01
-# effect_14042 6.994353e-02 6.495479e-03 2.483348e-03 5.562270e-02 6.836385e-06
-# effect_12524 1.119195e-01 4.107543e-01 2.985565e-02 2.579205e-05 1.001824e-01
-# effect_15456 4.913414e-05 4.380260e-01 2.733414e-01 5.166882e-01 3.610422e-01
-# effect_35844 2.623221e-09 4.570036e-09 1.864892e-07 1.013875e-09 4.094924e-11</code></pre>
+<div id="fit-mash-model-estimate-mixture-proportions" class="section level1">
+<h1>Fit mash model (estimate mixture proportions)</h1>
+<p>Now we fit mash to the random tests using both data-driven and canonical covariances.</p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb6-1" data-line-number="1">m =<span class="st"> </span><span class="kw">mash</span>(data.random, <span class="dt">Ulist =</span> <span class="kw">c</span>(U.ed,U.c), <span class="dt">outputlevel =</span> <span class="dv">1</span>)</a></code></pre></div>
 </div>
+<div id="compute-posterior-summaries" class="section level1">
+<h1>Compute posterior summaries</h1>
+<p>Now we can compute posterior summaries etc for any subset of tests using the above mash fit. Here we do this for the <code>strong</code> tests.</p>
+<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb7-1" data-line-number="1">m2 =<span class="st"> </span><span class="kw">mash</span>(data.strong, <span class="dt">g=</span><span class="kw">get_fitted_g</span>(m), <span class="dt">fixg=</span><span class="ot">TRUE</span>)</a>
+<a class="sourceLine" id="cb7-2" data-line-number="2"><span class="kw">head</span>(<span class="kw">get_lfsr</span>(m2))</a></code></pre></div>
 </div>
 
 

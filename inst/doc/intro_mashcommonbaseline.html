@@ -8,11 +8,11 @@
 <meta name="generator" content="pandoc" />
 <meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
 
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1" />
 
 <meta name="author" content="Yuxin Zou" />
 
-<meta name="date" content="2020-06-17" />
+<meta name="date" content="2021-05-19" />
 
 <title>mashr with common baseline</title>
 
@@ -117,9 +117,6 @@ padding-right: 2em;
 font-family: "Open Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
 font-size: 14px;
 line-height: 1.35;
-}
-#header {
-text-align: center;
 }
 #TOC {
 clear: both;
@@ -288,7 +285,8 @@ code > span.st { color: #d14; }
 code > span.co { color: #888888; font-style: italic; } 
 code > span.ot { color: #007020; } 
 code > span.al { color: #ff0000; font-weight: bold; } 
-code > span.fu { color: #900; font-weight: bold; }  code > span.er { color: #a61717; background-color: #e3d2d2; } 
+code > span.fu { color: #900; font-weight: bold; } 
+code > span.er { color: #a61717; background-color: #e3d2d2; } 
 </style>
 
 
@@ -303,7 +301,7 @@ code > span.fu { color: #900; font-weight: bold; }  code > span.er { color: #a61
 
 <h1 class="title toc-ignore">mashr with common baseline</h1>
 <h4 class="author">Yuxin Zou</h4>
-<h4 class="date">2020-06-17</h4>
+<h4 class="date">2021-05-19</h4>
 
 
 
@@ -311,7 +309,7 @@ code > span.fu { color: #900; font-weight: bold; }  code > span.er { color: #a61
 <h1>Introduction</h1>
 <p>This vignette illustrates how to use <code>mashr</code> to estimate the change in some quantity measured in multiple conditions compared with a <strong>common</strong> control condition.</p>
 <p>We assume that we have measurements in multiple conditions, and want to estimate the deviation in each condition from the control: that is, the difference in mean between that condition and the control condition. When we compare every condition to the same control then the observed deviations are correlated with one another (even under the null where there are no true differences among conditions). These correlations, if not properly accounted for, can lead to many false positives in a multivariate analysis. This vignette illustrates how to properly account for such correlations.</p>
-<p>Here is the <a href="https://stephenslab.github.io/mashr/articles/MASH_baseline.pdf">write-up</a> for the details of the model. When there is no control condition in the study, we can compare the quantity in different conditions with the mean. We illustrate an example in the <a href="intro_mashnobaseline.html">no baseline vignette</a>.</p>
+<p>Here is the <a href="https://stephenslab.github.io/mashr/articles/MASH_baseline.pdf">write-up</a> for the details of the/ model. When there is no control condition in the study, we can compare the quantity in different conditions with the mean. We illustrate an example in the <a href="intro_mashbaselinemean.html">common baseline at the mean vignette</a>.</p>
 <p>To deal with these correlations, mashr allows the user to specify the reference condition using <code>mash_update_data</code>, after setting up the data in <code>mash_set_data</code>.</p>
 <p><strong>Note</strong>: The correlations in deviations induced by comparing to a common baseline/control occur even if the measurements in different conditions are entirely independent. If the measurements in different conditions are also correlated with one another (eg in eQTL applications this can occur due to sample overlap among the different conditions) then this induces additional correlations into the analysis that should also be taken into account. In <code>common baseline</code> analysis, such additional correlations can be specified by the user (we have not yet implemented methods to estimate this additional correlation from the data).</p>
 </div>
@@ -335,11 +333,11 @@ code > span.fu { color: #900; font-weight: bold; }  code > span.er { color: #a61
 <div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb3-1" data-line-number="1">U.c =<span class="st"> </span><span class="kw">cov_canonical</span>(data.L)</a>
 <a class="sourceLine" id="cb3-2" data-line-number="2">mashcontrast.model =<span class="st"> </span><span class="kw">mash</span>(data.L, U.c, <span class="dt">algorithm.version =</span> <span class="st">'R'</span>)</a></code></pre></div>
 <pre><code>#  - Computing 12000 x 181 likelihood matrix.
-#  - Likelihood calculations took 0.92 seconds.
+#  - Likelihood calculations took 0.99 seconds.
 #  - Fitting model with 181 mixture components.
-#  - Model fitting took 5.84 seconds.
+#  - Model fitting took 5.63 seconds.
 #  - Computing posterior matrices.
-#  - Computation allocated took 0.17 seconds.</code></pre>
+#  - Computation allocated took 0.18 seconds.</code></pre>
 <div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb5-1" data-line-number="1"><span class="kw">print</span>(<span class="kw">get_loglik</span>(mashcontrast.model),<span class="dt">digits=</span><span class="dv">10</span>)</a></code></pre></div>
 <pre><code># [1] -105525.1372</code></pre>
 <p>Use <code>get_significant_results</code> to find the indices of effects that are ‘significant’:</p>
@@ -354,11 +352,11 @@ code > span.fu { color: #900; font-weight: bold; }  code > span.er { color: #a61
 <a class="sourceLine" id="cb9-2" data-line-number="2">data.wrong =<span class="st"> </span><span class="kw">mash_set_data</span>(<span class="dt">Bhat =</span> simdata<span class="op">$</span>Chat <span class="op">%*%</span><span class="st"> </span><span class="kw">t</span>(L), <span class="dt">Shat =</span> <span class="dv">1</span>)</a>
 <a class="sourceLine" id="cb9-3" data-line-number="3">m =<span class="st"> </span><span class="kw">mash</span>(data.wrong, U.c)</a></code></pre></div>
 <pre><code>#  - Computing 12000 x 181 likelihood matrix.
-#  - Likelihood calculations took 0.40 seconds.
+#  - Likelihood calculations took 0.34 seconds.
 #  - Fitting model with 181 mixture components.
-#  - Model fitting took 6.06 seconds.
+#  - Model fitting took 5.93 seconds.
 #  - Computing posterior matrices.
-#  - Computation allocated took 0.07 seconds.</code></pre>
+#  - Computation allocated took 0.06 seconds.</code></pre>
 <div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb11-1" data-line-number="1"><span class="kw">print</span>(<span class="kw">get_loglik</span>(m),<span class="dt">digits =</span> <span class="dv">10</span>)</a></code></pre></div>
 <pre><code># [1] -111355.197</code></pre>
 <p>We can see that the log likelihood is lower, since it does not consider the induced correlation.</p>

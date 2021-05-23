@@ -23,7 +23,8 @@ mash(
   A = NULL,
   posterior_samples = 0,
   seed = 123,
-  outputlevel = 2
+  outputlevel = 2,
+  output_lfdr = FALSE
 )
 }
 \arguments{
@@ -31,7 +32,8 @@ mash(
 errors, alpha value; created using \code{mash_set_data} or
 \code{mash_set_data_contrast}}
 
-\item{Ulist}{a list of covariance matrices to use}
+\item{Ulist}{a list of covariance matrices to use
+(see \code{normalizeU} for rescaling these matrices)}
 
 \item{gridmult}{scalar indicating factor by which adjacent grid
 values should differ; close to 1 for fine grid}
@@ -82,6 +84,13 @@ posteriors. It is used when \code{posterior_samples > 0}.}
 output only estimated mixture component proportions, 2: and
 posterior estimates, 3: and posterior covariance matrices, 4: and
 likelihood matrices}
+
+\item{output_lfdr}{If \code{output_lfdr = TRUE}, output local false
+discovery rate estimates. The lfdr tends to be sensitive to
+mis-estimated covariance matrices, and generally we do not
+recommend using them; we recommend using the local false sign rate
+(lfsr) instead, which is always returned, even when
+\code{output_lfdr = TRUE}.}
 }
 \value{
 a list with elements result, loglik and fitted_g

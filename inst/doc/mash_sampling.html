@@ -8,11 +8,11 @@
 <meta name="generator" content="pandoc" />
 <meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
 
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1" />
 
 <meta name="author" content="Yuxin Zou" />
 
-<meta name="date" content="2020-06-17" />
+<meta name="date" content="2021-05-19" />
 
 <title>Sample from mash posteriors</title>
 
@@ -117,9 +117,6 @@ padding-right: 2em;
 font-family: "Open Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
 font-size: 14px;
 line-height: 1.35;
-}
-#header {
-text-align: center;
 }
 #TOC {
 clear: both;
@@ -288,7 +285,8 @@ code > span.st { color: #d14; }
 code > span.co { color: #888888; font-style: italic; } 
 code > span.ot { color: #007020; } 
 code > span.al { color: #ff0000; font-weight: bold; } 
-code > span.fu { color: #900; font-weight: bold; }  code > span.er { color: #a61717; background-color: #e3d2d2; } 
+code > span.fu { color: #900; font-weight: bold; } 
+code > span.er { color: #a61717; background-color: #e3d2d2; } 
 </style>
 
 
@@ -303,7 +301,7 @@ code > span.fu { color: #900; font-weight: bold; }  code > span.er { color: #a61
 
 <h1 class="title toc-ignore">Sample from mash posteriors</h1>
 <h4 class="author">Yuxin Zou</h4>
-<h4 class="date">2020-06-17</h4>
+<h4 class="date">2021-05-19</h4>
 
 
 
@@ -323,11 +321,11 @@ code > span.fu { color: #900; font-weight: bold; }  code > span.er { color: #a61
 <p>Here, we draw 100 samples from the posteriors of each effect.</p>
 <div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb3-1" data-line-number="1">m =<span class="st"> </span><span class="kw">mash</span>(data, U.c, <span class="dt">algorithm.version =</span> <span class="st">'R'</span>, <span class="dt">posterior_samples =</span> <span class="dv">100</span>)</a></code></pre></div>
 <pre><code>#  - Computing 2000 x 151 likelihood matrix.
-#  - Likelihood calculations took 0.11 seconds.
+#  - Likelihood calculations took 0.09 seconds.
 #  - Fitting model with 151 mixture components.
-#  - Model fitting took 0.56 seconds.
+#  - Model fitting took 0.57 seconds.
 #  - Computing posterior matrices.
-#  - Computation allocated took 2.86 seconds.</code></pre>
+#  - Computation allocated took 2.78 seconds.</code></pre>
 <p>Using <code>get_samples(m)</code>, we have a <span class="math inline">\(2000 \times 5 \times 100\)</span> array for samples.</p>
 <p>If we fit the mash model without the posterior samples, we could use <code>mash_compute_posterior_matrices</code> to sample from the mash object.</p>
 <div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb5-1" data-line-number="1">m<span class="op">$</span>result =<span class="st"> </span><span class="kw">mash_compute_posterior_matrices</span>(m, data, <span class="dt">algorithm.version =</span> <span class="st">'R'</span>,</a>

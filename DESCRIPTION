@@ -2,8 +2,8 @@ Package: mashr
 Type: Package
 Encoding: UTF-8
 Title: Multivariate Adaptive Shrinkage
-Version: 0.2.38
-Date: 2020-06-16
+Version: 0.2.50
+Date: 2021-05-19
 Authors@R: c(person("Matthew","Stephens",role="aut"),
              person("Sarah","Urbut",role="aut"),
              person("Gao","Wang",role="aut"),
@@ -22,23 +22,23 @@ Description: Implements the multivariate adaptive shrinkage (mash)
     among conditions, then exploits these patterns to improve accuracy
     of the effect estimates. The core linear algebra is implemented in
     C++ for fast model fitting and posterior computation.
-URL: http://github.com/stephenslab/mashr
-BugReports: http://github.com/stephenslab/mashr/issues
+URL: https://github.com/stephenslab/mashr
+BugReports: https://github.com/stephenslab/mashr/issues
 License: BSD_3_clause + file LICENSE
 Copyright: file COPYRIGHTS
-LazyData: true
 SystemRequirements: C++11
 Depends: R (>= 3.3.0), ashr (>= 2.2-22)
 Imports: assertthat, utils, stats, plyr, rmeta, Rcpp (>= 0.12.11),
-        mvtnorm, abind
-LinkingTo: Rcpp, RcppArmadillo, RcppGSL
+        mvtnorm, abind, softImpute
+LinkingTo: Rcpp, RcppArmadillo, RcppGSL (>= 0.3.8)
 Suggests: MASS, REBayes, corrplot, testthat, kableExtra, knitr,
-        rmarkdown, profmem
+        rmarkdown, profmem, flashr (>= 0.6.7)
+Additional_repositories: https://stephenslab.github.io/flashr-drat
 VignetteBuilder: knitr
 NeedsCompilation: yes
 Biarch: true
-RoxygenNote: 7.1.0
-Packaged: 2020-06-17 05:04:31 UTC; pcarbo
+RoxygenNote: 7.1.1
+Packaged: 2021-05-19 13:31:53 UTC; pcarbo
 Author: Matthew Stephens [aut],
   Sarah Urbut [aut],
   Gao Wang [aut],
@@ -50,4 +50,4 @@ Author: Matthew Stephens [aut],
   Peter Carbonetto [aut, cre]
 Maintainer: Peter Carbonetto <peter.carbonetto@gmail.com>
 Repository: CRAN
-Date/Publication: 2020-06-19 05:50:11 UTC
+Date/Publication: 2021-05-24 00:10:02 UTC

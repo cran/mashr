@@ -1,0 +1,94 @@
+---
+title: "Empirical Bayes matrix factorization for data driven prior"
+author: "Gao Wang" 
+date: "`r Sys.Date()`"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{EBMN for prior}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE,comment = "#",fig.width = 5,
+                      fig.height = 4,fig.align = "center",
+                      eval = FALSE)
+```
+
+# Introduction
+
+This is continuation of the [eQTL analysis vignette][eqtl].
+In that vignette we have used PCA to compute data driven covariances. Here we demonstrate
+the use of additional data driven covariance, via [flash](https://github.com/stephenslab/flashr) decomposition.
+
+# Dataset simulation
+
+Same as the [eQTL analysis vignette][eqtl] we simulate a toy data-set,
+
+```{r}
+library(ashr)
+library(mashr)
+set.seed(1)
+simdata = simple_sims(10000,5,1) # simulates data on 40k tests
+
+# identify a subset of strong tests
+m.1by1 = mash_1by1(mash_set_data(simdata$Bhat,simdata$Shat))
+strong.subset = get_significant_results(m.1by1,0.05)
+
+# identify a random subset of 5000 tests
+random.subset = sample(1:nrow(simdata$Bhat),5000)
+```
+
+and create `random` and `strong` sets,
+
+```{r}
+data.temp = mash_set_data(simdata$Bhat[random.subset,],simdata$Shat[random.subset,])
+Vhat = estimate_null_correlation_simple(data.temp)
+rm(data.temp)
+data.random = mash_set_data(simdata$Bhat[random.subset,],simdata$Shat[random.subset,],V=Vhat)
+data.strong = mash_set_data(simdata$Bhat[strong.subset,],simdata$Shat[strong.subset,], V=Vhat)
+```
+
+# FLASH analysis
+
+We first perform the empirical Bayes matrix factorization via `flashr` using its default settings,
+
+```{r}
+U.f = cov_flash(data.strong)
+U.f
+```
+
+Alternatively, as [suggested by Jason Willwerscheid for multi-tissue QTL studies][willwerscheid],
+constrain factors to non-negative values. We can use `tag` parameter to customize the names in the output list:
+
+```{r}
+U.f = cov_flash(data.strong, factors="nonneg", tag="non_neg", var_type="constant")
+U.f
+```
+
+`var_type="constant"` is an additional parameter passed to `flash` function, as suggested in the post above.
+
+# Finalize covariances
+
+```{r}
+U.pca = cov_pca(data.strong, 5)
+U.ed = cov_ed(data.strong, c(U.f, U.pca))
+U.c = cov_canonical(data.random)
+```
+    
+# Fit mash model (estimate mixture proportions)
+
+Now we fit mash to the random tests using both data-driven and canonical covariances. 
+```{r}
+m = mash(data.random, Ulist = c(U.ed,U.c), outputlevel = 1)
+```
+
+# Compute posterior summaries
+
+Now we can compute posterior summaries etc for any subset of tests using the above mash fit. Here we do this for the `strong` tests.
+```{r}
+m2 = mash(data.strong, g=get_fitted_g(m), fixg=TRUE)
+head(get_lfsr(m2))
+```
+[eqtl]: https://stephenslab.github.io/mashr/articles/eQTL_outline.html
+[willwerscheid]: https://willwerscheid.github.io/MASHvFLASH/MASHvFLASHnn2.html

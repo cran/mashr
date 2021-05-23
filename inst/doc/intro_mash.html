@@ -8,11 +8,11 @@
 <meta name="generator" content="pandoc" />
 <meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
 
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1" />
 
 <meta name="author" content="Matthew Stephens" />
 
-<meta name="date" content="2020-06-17" />
+<meta name="date" content="2021-05-19" />
 
 <title>Introduction to mashr</title>
 
@@ -117,9 +117,6 @@ padding-right: 2em;
 font-family: "Open Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
 font-size: 14px;
 line-height: 1.35;
-}
-#header {
-text-align: center;
 }
 #TOC {
 clear: both;
@@ -288,7 +285,8 @@ code > span.st { color: #d14; }
 code > span.co { color: #888888; font-style: italic; } 
 code > span.ot { color: #007020; } 
 code > span.al { color: #ff0000; font-weight: bold; } 
-code > span.fu { color: #900; font-weight: bold; }  code > span.er { color: #a61717; background-color: #e3d2d2; } 
+code > span.fu { color: #900; font-weight: bold; } 
+code > span.er { color: #a61717; background-color: #e3d2d2; } 
 </style>
 
 
@@ -303,18 +301,18 @@ code > span.fu { color: #900; font-weight: bold; }  code > span.er { color: #a61
 
 <h1 class="title toc-ignore">Introduction to mashr</h1>
 <h4 class="author">Matthew Stephens</h4>
-<h4 class="date">2020-06-17</h4>
+<h4 class="date">2021-05-19</h4>
 
 
 
 <div id="goal" class="section level1">
 <h1>Goal</h1>
-<p>This vignette introduces the <code>mashr</code> software for someone who is familiar with the basic idea in <a href="https://www.biorxiv.org/content/early/2017/05/09/096552">Urbut et al.</a>, which we strongly recommend reading before proceeding.</p>
+<p>This vignette introduces the <code>mashr</code> software for someone who is familiar with the basic idea in <a href="https://www.biorxiv.org/content/10.1101/096552v2">Urbut et al.</a>, which we strongly recommend reading before proceeding.</p>
 <p>In this first vignette we use only the “canonical” covariance matries to simplify presentation. However, an important aspect of <code>mashr</code> is the use of data-driven covariance matrices that are learned from the data, so when you are done here you should look at <a href="intro_mash_dd.html">the data-driven vignette</a> and the <a href="simulate_noncanon.html">non-canonical matrix vignette</a>. If you think you may have correlations in your data measurements then also look at how to incorporate <a href="intro_correlations.html">correlations</a>.</p>
 </div>
 <div id="outline" class="section level1">
 <h1>Outline</h1>
-<p>This package implements the “multivariate adaptive shrinkage” (mash) method from <a href="https://www.biorxiv.org/content/early/2017/05/09/096552">Urbut et al.</a>.</p>
+<p>This package implements the “multivariate adaptive shrinkage” (mash) method from <a href="https://www.biorxiv.org/content/10.1101/096552v2">Urbut et al.</a>.</p>
 <p>Mash is a method for dealing with large numbers of tests in many (e.g. dozens) different conditions. Here “conditions” can mean many different things: it could be different tissues (as in Urbut et al), or different time points, or different treatments, or even different phenotypes (think of testing multiple phenotypes at many genetic variants in a GWAS).</p>
 <p>There are essentially four steps to a mash analysis</p>
 <ul>
@@ -360,9 +358,9 @@ code > span.fu { color: #900; font-weight: bold; }  code > span.er { color: #a61
 <pre><code>#  - Computing 2000 x 151 likelihood matrix.
 #  - Likelihood calculations took 0.04 seconds.
 #  - Fitting model with 151 mixture components.
-#  - Model fitting took 0.56 seconds.
+#  - Model fitting took 0.60 seconds.
 #  - Computing posterior matrices.
-#  - Computation allocated took 0.01 seconds.</code></pre>
+#  - Computation allocated took 0.02 seconds.</code></pre>
 <p>This can take a little time. What this does is to fit a mixture model to the data, estimating the mixture proportions. Specifically the model is that the true effects follow a mixture of multivariate normal distributions: <span class="math inline">\(B \sim \sum_k \sum_l \pi_{kl} N(0, \omega_l U_k)\)</span> where the <span class="math inline">\(\omega_l\)</span> are scaling factors set by the “grid” parameter in <code>mash</code> and the <span class="math inline">\(U_k\)</span> are the covariance matrices (here specified by <code>U.c</code>).</p>
 <p>Remember the Crucial Rule! This step must be peformed using all the tests (or a large random subset), because this is where <code>mash</code> learns that many tests are null and corrects for it.</p>
 </div>
@@ -455,7 +453,7 @@ code > span.fu { color: #900; font-weight: bold; }  code > span.er { color: #a61
 <div class="sourceCode" id="cb29"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb29-1" data-line-number="1"><span class="kw">print</span>(<span class="kw">sessionInfo</span>())</a></code></pre></div>
 <pre><code># R version 3.6.2 (2019-12-12)
 # Platform: x86_64-apple-darwin15.6.0 (64-bit)
-# Running under: macOS Catalina 10.15.5
+# Running under: macOS Catalina 10.15.7
 # 
 # Matrix products: default
 # BLAS:   /Library/Frameworks/R.framework/Versions/3.6/Resources/lib/libRblas.0.dylib
@@ -468,16 +466,16 @@ code > span.fu { color: #900; font-weight: bold; }  code > span.er { color: #a61
 # [1] stats     graphics  grDevices utils     datasets  methods   base     
 # 
 # other attached packages:
-# [1] mashr_0.2.38 ashr_2.2-50 
+# [1] mashr_0.2.50 ashr_2.2-51 
 # 
 # loaded via a namespace (and not attached):
-#  [1] Rcpp_1.0.3        knitr_1.26        magrittr_1.5      SQUAREM_2017.10-1
+#  [1] Rcpp_1.0.5        knitr_1.26        magrittr_1.5      SQUAREM_2017.10-1
 #  [5] lattice_0.20-38   rlang_0.4.5       stringr_1.4.0     plyr_1.8.5       
 #  [9] tools_3.6.2       grid_3.6.2        xfun_0.11         rmeta_3.0        
 # [13] irlba_2.3.3       invgamma_1.1      htmltools_0.4.0   yaml_2.2.0       
-# [17] abind_1.4-5       digest_0.6.23     assertthat_0.2.1  mixsqp_0.3-43    
-# [21] Matrix_1.2-18     evaluate_0.14     rmarkdown_2.0     stringi_1.4.3    
-# [25] compiler_3.6.2    truncnorm_1.0-8   mvtnorm_1.0-11</code></pre>
+# [17] abind_1.4-5       digest_0.6.23     assertthat_0.2.1  softImpute_1.4   
+# [21] mixsqp_0.3-46     Matrix_1.2-18     evaluate_0.14     rmarkdown_2.3    
+# [25] stringi_1.4.3     compiler_3.6.2    truncnorm_1.0-8   mvtnorm_1.0-11</code></pre>
 </div>
 
 
