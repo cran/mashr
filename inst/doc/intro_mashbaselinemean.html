@@ -12,13 +12,29 @@
 
 <meta name="author" content="Yuxin Zou" />
 
-<meta name="date" content="2021-05-19" />
+<meta name="date" content="2022-01-24" />
 
 <title>mashr with common baseline at mean</title>
 
 
+<style type="text/css">
+  code{white-space: pre-wrap;}
+  span.smallcaps{font-variant: small-caps;}
+  span.underline{text-decoration: underline;}
+  div.column{display: inline-block; vertical-align: top; width: 50%;}
+  div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+  ul.task-list{list-style: none;}
+    </style>
 
-<style type="text/css">code{white-space: pre;}</style>
+
+<style type="text/css">
+  code {
+    white-space: pre;
+  }
+  .sourceCode {
+    overflow: visible;
+  }
+</style>
 <style type="text/css" data-origin="pandoc">
 a.sourceLine { display: inline-block; line-height: 1.25; }
 a.sourceLine { pointer-events: none; color: inherit; text-decoration: inherit; }
@@ -104,6 +120,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
   }
 })();
 </script>
+
 
 
 
@@ -301,7 +318,7 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 
 <h1 class="title toc-ignore">mashr with common baseline at mean</h1>
 <h4 class="author">Yuxin Zou</h4>
-<h4 class="date">2021-05-19</h4>
+<h4 class="date">2022-01-24</h4>
 
 
 
@@ -374,9 +391,9 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 </ol>
 <div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb7-1" data-line-number="1">m =<span class="st"> </span><span class="kw">mash</span>(data.L, <span class="kw">c</span>(U.c,U.ed), <span class="dt">algorithm.version =</span> <span class="st">'R'</span>)</a></code></pre></div>
 <pre><code>#  - Computing 2000 x 181 likelihood matrix.
-#  - Likelihood calculations took 0.17 seconds.
+#  - Likelihood calculations took 0.11 seconds.
 #  - Fitting model with 181 mixture components.
-#  - Model fitting took 1.35 seconds.
+#  - Model fitting took 0.96 seconds.
 #  - Computing posterior matrices.
 #  - Computation allocated took 0.02 seconds.</code></pre>
 <p>The log likelihood is</p>

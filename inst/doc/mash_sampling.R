@@ -21,13 +21,13 @@ m$result = mash_compute_posterior_matrices(m, data, algorithm.version = 'R',
 ## -----------------------------------------------------------------------------
 library(corrplot)
 x = get_pairwise_sharing_from_samples(m, factor=0.5, lfsr_thresh = 1)
-corrplot(x, method='color', cl.lim=c(0,1), type='upper', addCoef.col = "black", tl.col="black", tl.srt=45, title = 'Pairwise Sharing by Magnitude', mar = c(4,0,4,0))
+corrplot(x, method='color', col.lim=c(0,1), type='upper', addCoef.col = "black", tl.col="black", tl.srt=45, title = 'Pairwise Sharing by Magnitude', mar = c(4,0,4,0))
 
 ## -----------------------------------------------------------------------------
 x = get_pairwise_sharing_from_samples(m, factor=0.5, lfsr_thresh = 0.05)
-corrplot(x, method='color', cl.lim=c(0,1), type='upper', addCoef.col = "black", tl.col="black", tl.srt=45, title = 'Pairwise Sharing by Magnitude', mar = c(4,0,4,0))
+corrplot(x, method='color', col.lim=c(0,1), type='upper', addCoef.col = "black", tl.col="black", tl.srt=45, title = 'Pairwise Sharing by Magnitude', mar = c(4,0,4,0))
 
 ## -----------------------------------------------------------------------------
 x = get_pairwise_sharing(m, factor=0.5)
-corrplot(x, method='color', cl.lim=c(0,1), type='upper', addCoef.col = "black", tl.col="black", tl.srt=45, title = 'Pairwise Sharing by Magnitude', mar = c(4,0,4,0))
+corrplot(x, method='color', col.lim=c(0,1), type='upper', addCoef.col = "black", tl.col="black", tl.srt=45, title = 'Pairwise Sharing by Magnitude', mar = c(4,0,4,0))
 

@@ -12,13 +12,29 @@
 
 <meta name="author" content="Matthew Stephens" />
 
-<meta name="date" content="2021-05-19" />
+<meta name="date" content="2022-01-24" />
 
 <title>Introduction to mashr</title>
 
 
+<style type="text/css">
+  code{white-space: pre-wrap;}
+  span.smallcaps{font-variant: small-caps;}
+  span.underline{text-decoration: underline;}
+  div.column{display: inline-block; vertical-align: top; width: 50%;}
+  div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+  ul.task-list{list-style: none;}
+    </style>
 
-<style type="text/css">code{white-space: pre;}</style>
+
+<style type="text/css">
+  code {
+    white-space: pre;
+  }
+  .sourceCode {
+    overflow: visible;
+  }
+</style>
 <style type="text/css" data-origin="pandoc">
 a.sourceLine { display: inline-block; line-height: 1.25; }
 a.sourceLine { pointer-events: none; color: inherit; text-decoration: inherit; }
@@ -104,6 +120,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
   }
 })();
 </script>
+
 
 
 
@@ -301,7 +318,7 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 
 <h1 class="title toc-ignore">Introduction to mashr</h1>
 <h4 class="author">Matthew Stephens</h4>
-<h4 class="date">2021-05-19</h4>
+<h4 class="date">2022-01-24</h4>
 
 
 
@@ -358,9 +375,9 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 <pre><code>#  - Computing 2000 x 151 likelihood matrix.
 #  - Likelihood calculations took 0.04 seconds.
 #  - Fitting model with 151 mixture components.
-#  - Model fitting took 0.60 seconds.
+#  - Model fitting took 0.54 seconds.
 #  - Computing posterior matrices.
-#  - Computation allocated took 0.02 seconds.</code></pre>
+#  - Computation allocated took 0.01 seconds.</code></pre>
 <p>This can take a little time. What this does is to fit a mixture model to the data, estimating the mixture proportions. Specifically the model is that the true effects follow a mixture of multivariate normal distributions: <span class="math inline">\(B \sim \sum_k \sum_l \pi_{kl} N(0, \omega_l U_k)\)</span> where the <span class="math inline">\(\omega_l\)</span> are scaling factors set by the “grid” parameter in <code>mash</code> and the <span class="math inline">\(U_k\)</span> are the covariance matrices (here specified by <code>U.c</code>).</p>
 <p>Remember the Crucial Rule! This step must be peformed using all the tests (or a large random subset), because this is where <code>mash</code> learns that many tests are null and corrects for it.</p>
 </div>
@@ -466,16 +483,17 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 # [1] stats     graphics  grDevices utils     datasets  methods   base     
 # 
 # other attached packages:
-# [1] mashr_0.2.50 ashr_2.2-51 
+# [1] mashr_0.2.57 ashr_2.2-51 
 # 
 # loaded via a namespace (and not attached):
-#  [1] Rcpp_1.0.5        knitr_1.26        magrittr_1.5      SQUAREM_2017.10-1
-#  [5] lattice_0.20-38   rlang_0.4.5       stringr_1.4.0     plyr_1.8.5       
-#  [9] tools_3.6.2       grid_3.6.2        xfun_0.11         rmeta_3.0        
-# [13] irlba_2.3.3       invgamma_1.1      htmltools_0.4.0   yaml_2.2.0       
-# [17] abind_1.4-5       digest_0.6.23     assertthat_0.2.1  softImpute_1.4   
-# [21] mixsqp_0.3-46     Matrix_1.2-18     evaluate_0.14     rmarkdown_2.3    
-# [25] stringi_1.4.3     compiler_3.6.2    truncnorm_1.0-8   mvtnorm_1.0-11</code></pre>
+#  [1] Rcpp_1.0.7        knitr_1.37        magrittr_2.0.1    SQUAREM_2017.10-1
+#  [5] lattice_0.20-38   rlang_0.4.11      highr_0.8         stringr_1.4.0    
+#  [9] plyr_1.8.5        tools_3.6.2       grid_3.6.2        xfun_0.29        
+# [13] rmeta_3.0         irlba_2.3.3       invgamma_1.1      htmltools_0.4.0  
+# [17] yaml_2.2.0        abind_1.4-5       digest_0.6.23     assertthat_0.2.1 
+# [21] softImpute_1.4    mixsqp_0.3-46     Matrix_1.2-18     evaluate_0.14    
+# [25] rmarkdown_2.11    stringi_1.4.3     compiler_3.6.2    truncnorm_1.0-8  
+# [29] mvtnorm_1.0-11</code></pre>
 </div>
 
 

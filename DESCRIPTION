@@ -2,8 +2,8 @@ Package: mashr
 Type: Package
 Encoding: UTF-8
 Title: Multivariate Adaptive Shrinkage
-Version: 0.2.50
-Date: 2021-05-19
+Version: 0.2.57
+Date: 2022-01-24
 Authors@R: c(person("Matthew","Stephens",role="aut"),
              person("Sarah","Urbut",role="aut"),
              person("Gao","Wang",role="aut"),
@@ -31,14 +31,14 @@ Depends: R (>= 3.3.0), ashr (>= 2.2-22)
 Imports: assertthat, utils, stats, plyr, rmeta, Rcpp (>= 0.12.11),
         mvtnorm, abind, softImpute
 LinkingTo: Rcpp, RcppArmadillo, RcppGSL (>= 0.3.8)
-Suggests: MASS, REBayes, corrplot, testthat, kableExtra, knitr,
-        rmarkdown, profmem, flashr (>= 0.6.7)
+Suggests: MASS, REBayes, corrplot (>= 0.90), testthat, kableExtra,
+        knitr, rmarkdown, profmem, flashr (>= 0.6.7)
 Additional_repositories: https://stephenslab.github.io/flashr-drat
 VignetteBuilder: knitr
 NeedsCompilation: yes
 Biarch: true
 RoxygenNote: 7.1.1
-Packaged: 2021-05-19 13:31:53 UTC; pcarbo
+Packaged: 2022-01-24 15:52:39 UTC; pcarbo
 Author: Matthew Stephens [aut],
   Sarah Urbut [aut],
   Gao Wang [aut],
@@ -50,4 +50,4 @@ Author: Matthew Stephens [aut],
   Peter Carbonetto [aut, cre]
 Maintainer: Peter Carbonetto <peter.carbonetto@gmail.com>
 Repository: CRAN
-Date/Publication: 2021-05-24 00:10:02 UTC
+Date/Publication: 2022-01-25 08:52:46 UTC

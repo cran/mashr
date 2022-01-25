@@ -12,13 +12,29 @@
 
 <meta name="author" content="Matthew Stephens" />
 
-<meta name="date" content="2021-05-19" />
+<meta name="date" content="2022-01-24" />
 
 <title>eQTL analysis outline</title>
 
 
+<style type="text/css">
+  code{white-space: pre-wrap;}
+  span.smallcaps{font-variant: small-caps;}
+  span.underline{text-decoration: underline;}
+  div.column{display: inline-block; vertical-align: top; width: 50%;}
+  div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+  ul.task-list{list-style: none;}
+    </style>
 
-<style type="text/css">code{white-space: pre;}</style>
+
+<style type="text/css">
+  code {
+    white-space: pre;
+  }
+  .sourceCode {
+    overflow: visible;
+  }
+</style>
 <style type="text/css" data-origin="pandoc">
 a.sourceLine { display: inline-block; line-height: 1.25; }
 a.sourceLine { pointer-events: none; color: inherit; text-decoration: inherit; }
@@ -104,6 +120,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
   }
 })();
 </script>
+
 
 
 
@@ -301,7 +318,7 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 
 <h1 class="title toc-ignore">eQTL analysis outline</h1>
 <h4 class="author">Matthew Stephens</h4>
-<h4 class="date">2021-05-19</h4>
+<h4 class="date">2022-01-24</h4>
 
 
 
@@ -364,9 +381,9 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 <div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb5-1" data-line-number="1">U.c =<span class="st"> </span><span class="kw">cov_canonical</span>(data.random)</a>
 <a class="sourceLine" id="cb5-2" data-line-number="2">m =<span class="st"> </span><span class="kw">mash</span>(data.random, <span class="dt">Ulist =</span> <span class="kw">c</span>(U.ed,U.c), <span class="dt">outputlevel =</span> <span class="dv">1</span>)</a></code></pre></div>
 <pre><code>#  - Computing 5000 x 241 likelihood matrix.
-#  - Likelihood calculations took 0.17 seconds.
+#  - Likelihood calculations took 0.27 seconds.
 #  - Fitting model with 241 mixture components.
-#  - Model fitting took 3.87 seconds.</code></pre>
+#  - Model fitting took 3.77 seconds.</code></pre>
 </div>
 <div id="compute-posterior-summaries" class="section level2">
 <h2>Compute posterior summaries</h2>
@@ -374,7 +391,7 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 <code>g=get_fitted_g(m), fixg=TRUE</code>. (In <code>mash</code> the parameter <code>g</code> is used to denote the mixture model which we learned above.)</p>
 <div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb7-1" data-line-number="1">m2 =<span class="st"> </span><span class="kw">mash</span>(data.strong, <span class="dt">g=</span><span class="kw">get_fitted_g</span>(m), <span class="dt">fixg=</span><span class="ot">TRUE</span>)</a></code></pre></div>
 <pre><code>#  - Computing 1428 x 241 likelihood matrix.
-#  - Likelihood calculations took 0.04 seconds.
+#  - Likelihood calculations took 0.05 seconds.
 #  - Computing posterior matrices.
 #  - Computation allocated took 0.02 seconds.</code></pre>
 <div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb9-1" data-line-number="1"><span class="kw">head</span>(<span class="kw">get_lfsr</span>(m2))</a></code></pre></div>
