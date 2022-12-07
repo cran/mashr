@@ -12,10 +12,23 @@
 
 <meta name="author" content="Matthew Stephens" />
 
-<meta name="date" content="2022-01-24" />
+<meta name="date" content="2022-12-07" />
 
 <title>Introduction to mash: data-driven covariances</title>
 
+<script>// Pandoc 2.9 adds attributes on both header and div. We remove the former (to
+// be compatible with the behavior of Pandoc < 2.8).
+document.addEventListener('DOMContentLoaded', function(e) {
+  var hs = document.querySelectorAll("div.section[class*='level'] > :first-child");
+  var i, h, a;
+  for (i = 0; i < hs.length; i++) {
+    h = hs[i];
+    if (!/^h[1-6]$/i.test(h.tagName)) continue;  // it should be a header h1-h6
+    a = h.attributes;
+    while (a.length > 0) h.removeAttribute(a[0].name);
+  }
+});
+</script>
 
 <style type="text/css">
   code{white-space: pre-wrap;}
@@ -36,26 +49,28 @@
   }
 </style>
 <style type="text/css" data-origin="pandoc">
-a.sourceLine { display: inline-block; line-height: 1.25; }
-a.sourceLine { pointer-events: none; color: inherit; text-decoration: inherit; }
-a.sourceLine:empty { height: 1.2em; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
 .sourceCode { overflow: visible; }
-code.sourceCode { white-space: pre; position: relative; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
 div.sourceCode { margin: 1em 0; }
 pre.sourceCode { margin: 0; }
 @media screen {
 div.sourceCode { overflow: auto; }
 }
 @media print {
-code.sourceCode { white-space: pre-wrap; }
-a.sourceLine { text-indent: -1em; padding-left: 1em; }
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
 }
-pre.numberSource a.sourceLine
-  { position: relative; left: -4em; }
-pre.numberSource a.sourceLine::before
-  { content: attr(data-line-number);
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
     position: relative; left: -1em; text-align: right; vertical-align: baseline;
-    border: none; pointer-events: all; display: inline-block;
+    border: none; display: inline-block;
     -webkit-touch-callout: none; -webkit-user-select: none;
     -khtml-user-select: none; -moz-user-select: none;
     -ms-user-select: none; user-select: none;
@@ -64,9 +79,9 @@ pre.numberSource a.sourceLine::before
   }
 pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
 div.sourceCode
-  {  }
+  {   }
 @media screen {
-a.sourceLine::before { text-decoration: underline; }
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
 }
 code span.al { color: #ff0000; font-weight: bold; } /* Alert */
 code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
@@ -316,15 +331,17 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 
 
 
-<h1 class="title toc-ignore">Introduction to mash: data-driven covariances</h1>
+<h1 class="title toc-ignore">Introduction to mash: data-driven
+covariances</h1>
 <h4 class="author">Matthew Stephens</h4>
-<h4 class="date">2022-01-24</h4>
+<h4 class="date">2022-12-07</h4>
 
 
 
 <div id="goal" class="section level2">
 <h2>Goal</h2>
-<p>This vignette introduces the important topic of using data-driven covariance matries in <code>mashr</code>. You should read <a href="intro_mash.html">the introductory vignette</a> before this.</p>
+<p>This vignette introduces the important topic of using data-driven
+covariance matries in <code>mashr</code>. You should read <a href="intro_mash.html">the introductory vignette</a> before this.</p>
 </div>
 <div id="outline" class="section level2">
 <h2>Outline</h2>
@@ -333,65 +350,113 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 <li><p>Read in the data</p></li>
 <li><p>Set up the covariance matrices to be used</p></li>
 <li><p>Fit the model</p></li>
-<li><p>Extract posterior summaries and other quantities of interest</p></li>
+<li><p>Extract posterior summaries and other quantities of
+interest</p></li>
 </ul>
-<p>Here we pay more attention to Step 2, which can be split into two steps:</p>
+<p>Here we pay more attention to Step 2, which can be split into two
+steps:</p>
 <ul>
 <li><p>Set up the “canonical” covariance matrices.</p></li>
 <li><p>Set up the “data-driven” covariance matrices.</p></li>
 </ul>
-<p>The first of these steps (“canonical” covariance matrices) is straightforward using <code>cov_canonical</code>, as illustrated in <a href="intro_mash.html">the introductory vignette</a>.</p>
-<p>Setting up the data-driven matrices is slightly more complex, and there are multiple possible approaches. This vignette illustrates one approach.</p>
-<p>First we simulate some data for illustration (see the <a href="intro_mash.html">the introductory vignette</a> for more details):</p>
-<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb1-1" data-line-number="1"><span class="kw">library</span>(ashr)</a>
-<a class="sourceLine" id="cb1-2" data-line-number="2"><span class="kw">library</span>(mashr)</a>
-<a class="sourceLine" id="cb1-3" data-line-number="3"><span class="kw">set.seed</span>(<span class="dv">1</span>)</a>
-<a class="sourceLine" id="cb1-4" data-line-number="4">simdata =<span class="st"> </span><span class="kw">simple_sims</span>(<span class="dv">500</span>,<span class="dv">5</span>,<span class="dv">1</span>)</a></code></pre></div>
+<p>The first of these steps (“canonical” covariance matrices) is
+straightforward using <code>cov_canonical</code>, as illustrated in <a href="intro_mash.html">the introductory vignette</a>.</p>
+<p>Setting up the data-driven matrices is slightly more complex, and
+there are multiple possible approaches. This vignette illustrates one
+approach.</p>
+<p>First we simulate some data for illustration (see the <a href="intro_mash.html">the introductory vignette</a> for more
+details):</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(ashr)</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(mashr)</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">1</span>)</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>simdata <span class="ot">=</span> <span class="fu">simple_sims</span>(<span class="dv">500</span>,<span class="dv">5</span>,<span class="dv">1</span>)</span></code></pre></div>
 </div>
 <div id="data-driven-covariances" class="section level2">
 <h2>Data-driven covariances</h2>
-<p>Although the user is free to set up data driven covariance matrices using any method that they would like, typically we suggest the following three-step strategy:</p>
+<p>Although the user is free to set up data driven covariance matrices
+using any method that they would like, typically we suggest the
+following three-step strategy:</p>
 <ol style="list-style-type: decimal">
-<li><p>Locate some strong signals. For example, here we do this within R by running a “condition-by-condition” using <code>mash_1by1</code>, but you could do this as a preprocessing step in other software - for example in eQTL studies you might instead put together a separate dataset containing the test results for only the “top” eQTL or eQTLs in each gene.</p></li>
-<li><p>Use methods such as PCA or factor analysis on these top signals to compute some initial data-driven covariance matrices (e.g. using <code>cov_pca</code>).</p></li>
-<li><p>Use these data-driven covariance matrices as initializations for the extreme deconvolution (ED) algorithm (using <code>cov_ed</code>), to get some refined data-driven covariance matrix estimates.</p></li>
+<li><p>Locate some strong signals. For example, here we do this within R
+by running a “condition-by-condition” using <code>mash_1by1</code>, but
+you could do this as a preprocessing step in other software - for
+example in eQTL studies you might instead put together a separate
+dataset containing the test results for only the “top” eQTL or eQTLs in
+each gene.</p></li>
+<li><p>Use methods such as PCA or factor analysis on these top signals
+to compute some initial data-driven covariance matrices (e.g. using
+<code>cov_pca</code>).</p></li>
+<li><p>Use these data-driven covariance matrices as initializations for
+the extreme deconvolution (ED) algorithm (using <code>cov_ed</code>), to
+get some refined data-driven covariance matrix estimates.</p></li>
 </ol>
-<p>The ED step is helpful primarily because the second step will often estimate the covariances of the observed data (Bhat) whereas what is required is the covariances of the actual underlying effects (B), and this is what ED estimates. However, ED can be quite sensitive to initialization, and so the goal of the second step is to provide a good initialization.</p>
+<p>The ED step is helpful primarily because the second step will often
+estimate the covariances of the observed data (Bhat) whereas what is
+required is the covariances of the actual underlying effects (B), and
+this is what ED estimates. However, ED can be quite sensitive to
+initialization, and so the goal of the second step is to provide a good
+initialization.</p>
 <div id="step-1-select-strong-signals" class="section level3">
 <h3>Step 1: select strong signals</h3>
-<p>If your entire data set (matrix of <em>all</em> tests in all conditions) is not too big (eg &lt;100k tests say) then you can simply do this by setting up the entire data set as a mash data object (using <code>mash_set_data</code>), and then running a condition-by-condition (1by1) analysis on all the data. For example, here we select the strong signals as those with lfsr&lt;0.05 in any condition in the 1by1 analysis.</p>
-<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb2-1" data-line-number="1">data   =<span class="st"> </span><span class="kw">mash_set_data</span>(simdata<span class="op">$</span>Bhat, simdata<span class="op">$</span>Shat)</a>
-<a class="sourceLine" id="cb2-2" data-line-number="2">m<span class="fl">.1</span>by1 =<span class="st"> </span><span class="kw">mash_1by1</span>(data)</a>
-<a class="sourceLine" id="cb2-3" data-line-number="3">strong =<span class="st"> </span><span class="kw">get_significant_results</span>(m<span class="fl">.1</span>by1,<span class="fl">0.05</span>)</a></code></pre></div>
-<p>This sets up a vector <code>strong</code> containing the indices corresponding to the “significant” rows of the test results in <code>data</code>. This vector is used in subsequent functions below to specify which rows of <code>data</code> to use.</p>
+<p>If your entire data set (matrix of <em>all</em> tests in all
+conditions) is not too big (eg &lt;100k tests say) then you can simply
+do this by setting up the entire data set as a mash data object (using
+<code>mash_set_data</code>), and then running a condition-by-condition
+(1by1) analysis on all the data. For example, here we select the strong
+signals as those with lfsr&lt;0.05 in any condition in the 1by1
+analysis.</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>data   <span class="ot">=</span> <span class="fu">mash_set_data</span>(simdata<span class="sc">$</span>Bhat, simdata<span class="sc">$</span>Shat)</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>m<span class="fl">.1</span>by1 <span class="ot">=</span> <span class="fu">mash_1by1</span>(data)</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>strong <span class="ot">=</span> <span class="fu">get_significant_results</span>(m<span class="fl">.1</span>by1,<span class="fl">0.05</span>)</span></code></pre></div>
+<p>This sets up a vector <code>strong</code> containing the indices
+corresponding to the “significant” rows of the test results in
+<code>data</code>. This vector is used in subsequent functions below to
+specify which rows of <code>data</code> to use.</p>
 </div>
 <div id="step-2-obtain-initial-data-driven-covariance-matrices" class="section level3">
 <h3>Step 2: Obtain initial data-driven covariance matrices</h3>
-<p>There are various approaches to this; here we just illustrate the simplest and quickest (but probably not the best), which is to use PCA. Specifically here we use the function <code>cov_pca</code> to produce covariance matrices based on the top 5 PCs of the strong signals. The result is a list of 6 covariance matrices: one based on all 5 PCs, and the others each based on one PC.</p>
-<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb3-1" data-line-number="1">U.pca =<span class="st"> </span><span class="kw">cov_pca</span>(data,<span class="dv">5</span>,<span class="dt">subset=</span>strong)</a>
-<a class="sourceLine" id="cb3-2" data-line-number="2"><span class="kw">print</span>(<span class="kw">names</span>(U.pca))</a></code></pre></div>
+<p>There are various approaches to this; here we just illustrate the
+simplest and quickest (but probably not the best), which is to use PCA.
+Specifically here we use the function <code>cov_pca</code> to produce
+covariance matrices based on the top 5 PCs of the strong signals. The
+result is a list of 6 covariance matrices: one based on all 5 PCs, and
+the others each based on one PC.</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>U.pca <span class="ot">=</span> <span class="fu">cov_pca</span>(data,<span class="dv">5</span>,<span class="at">subset=</span>strong)</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(<span class="fu">names</span>(U.pca))</span></code></pre></div>
 </div>
 <div id="step-3-apply-extreme-deconvolution" class="section level3">
 <h3>Step 3: Apply Extreme Deconvolution</h3>
-<p>The function <code>cov_ed</code> is used to apply the ED algorithm from a specified initialization (here <code>U.pca</code>) and to a specified subset of signals.</p>
-<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb4-1" data-line-number="1">U.ed =<span class="st"> </span><span class="kw">cov_ed</span>(data, U.pca, <span class="dt">subset=</span>strong)</a></code></pre></div>
+<p>The function <code>cov_ed</code> is used to apply the ED algorithm
+from a specified initialization (here <code>U.pca</code>) and to a
+specified subset of signals.</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>U.ed <span class="ot">=</span> <span class="fu">cov_ed</span>(data, U.pca, <span class="at">subset=</span>strong)</span></code></pre></div>
 </div>
 </div>
 <div id="run-mash" class="section level2">
 <h2>Run mash</h2>
-<p>After all this we are ready to run <code>mash</code> using the data driven matrices. Remember the Crucial Rule that we must fit mash to <em>all</em> tests - do not use only the <code>strong</code> subset here!!</p>
-<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb5-1" data-line-number="1">m.ed =<span class="st"> </span><span class="kw">mash</span>(data, U.ed)</a>
-<a class="sourceLine" id="cb5-2" data-line-number="2"><span class="kw">print</span>(<span class="kw">get_loglik</span>(m.ed),<span class="dt">digits =</span> <span class="dv">10</span>)</a></code></pre></div>
-<p>From the fit we see that the fit using the data-driven covariances is not as good as when we used the canonical covariances (which was -16120.32; from <a href="intro_mash.html">the introductory vignette</a>). This is expected for this simulation because the simulation actually used the canonical covariances!</p>
-<p>In general we recommend running <code>mash</code> with both data-driven and canonical covariances. You could do this by combining the data-driven and canonical covariances as in this code:</p>
-<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb6-1" data-line-number="1">U.c =<span class="st"> </span><span class="kw">cov_canonical</span>(data)  </a>
-<a class="sourceLine" id="cb6-2" data-line-number="2">m   =<span class="st"> </span><span class="kw">mash</span>(data, <span class="kw">c</span>(U.c,U.ed))</a>
-<a class="sourceLine" id="cb6-3" data-line-number="3"><span class="kw">print</span>(<span class="kw">get_loglik</span>(m),<span class="dt">digits =</span> <span class="dv">10</span>)</a></code></pre></div>
-<p>For an example with simulations that do not follow the standard canonical matrices see <a href="simulate_noncanon.html">here</a>.</p>
+<p>After all this we are ready to run <code>mash</code> using the data
+driven matrices. Remember the Crucial Rule that we must fit mash to
+<em>all</em> tests - do not use only the <code>strong</code> subset
+here!!</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>m.ed <span class="ot">=</span> <span class="fu">mash</span>(data, U.ed)</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(<span class="fu">get_loglik</span>(m.ed),<span class="at">digits =</span> <span class="dv">10</span>)</span></code></pre></div>
+<p>From the fit we see that the fit using the data-driven covariances is
+not as good as when we used the canonical covariances (which was
+-16120.32; from <a href="intro_mash.html">the introductory
+vignette</a>). This is expected for this simulation because the
+simulation actually used the canonical covariances!</p>
+<p>In general we recommend running <code>mash</code> with both
+data-driven and canonical covariances. You could do this by combining
+the data-driven and canonical covariances as in this code:</p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>U.c <span class="ot">=</span> <span class="fu">cov_canonical</span>(data)  </span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>m   <span class="ot">=</span> <span class="fu">mash</span>(data, <span class="fu">c</span>(U.c,U.ed))</span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(<span class="fu">get_loglik</span>(m),<span class="at">digits =</span> <span class="dv">10</span>)</span></code></pre></div>
+<p>For an example with simulations that do not follow the standard
+canonical matrices see <a href="simulate_noncanon.html">here</a>.</p>
 </div>
 <div id="session-information." class="section level2">
 <h2>Session information.</h2>
-<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb7-1" data-line-number="1"><span class="kw">print</span>(<span class="kw">sessionInfo</span>())</a></code></pre></div>
+<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(<span class="fu">sessionInfo</span>())</span></code></pre></div>
 </div>
 
 

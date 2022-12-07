@@ -12,10 +12,23 @@
 
 <meta name="author" content="Yuxin Zou" />
 
-<meta name="date" content="2022-01-24" />
+<meta name="date" content="2022-12-07" />
 
 <title>mashr with common baseline at mean</title>
 
+<script>// Pandoc 2.9 adds attributes on both header and div. We remove the former (to
+// be compatible with the behavior of Pandoc < 2.8).
+document.addEventListener('DOMContentLoaded', function(e) {
+  var hs = document.querySelectorAll("div.section[class*='level'] > :first-child");
+  var i, h, a;
+  for (i = 0; i < hs.length; i++) {
+    h = hs[i];
+    if (!/^h[1-6]$/i.test(h.tagName)) continue;  // it should be a header h1-h6
+    a = h.attributes;
+    while (a.length > 0) h.removeAttribute(a[0].name);
+  }
+});
+</script>
 
 <style type="text/css">
   code{white-space: pre-wrap;}
@@ -36,26 +49,28 @@
   }
 </style>
 <style type="text/css" data-origin="pandoc">
-a.sourceLine { display: inline-block; line-height: 1.25; }
-a.sourceLine { pointer-events: none; color: inherit; text-decoration: inherit; }
-a.sourceLine:empty { height: 1.2em; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
 .sourceCode { overflow: visible; }
-code.sourceCode { white-space: pre; position: relative; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
 div.sourceCode { margin: 1em 0; }
 pre.sourceCode { margin: 0; }
 @media screen {
 div.sourceCode { overflow: auto; }
 }
 @media print {
-code.sourceCode { white-space: pre-wrap; }
-a.sourceLine { text-indent: -1em; padding-left: 1em; }
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
 }
-pre.numberSource a.sourceLine
-  { position: relative; left: -4em; }
-pre.numberSource a.sourceLine::before
-  { content: attr(data-line-number);
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
     position: relative; left: -1em; text-align: right; vertical-align: baseline;
-    border: none; pointer-events: all; display: inline-block;
+    border: none; display: inline-block;
     -webkit-touch-callout: none; -webkit-user-select: none;
     -khtml-user-select: none; -moz-user-select: none;
     -ms-user-select: none; user-select: none;
@@ -64,9 +79,9 @@ pre.numberSource a.sourceLine::before
   }
 pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
 div.sourceCode
-  {  }
+  {   }
 @media screen {
-a.sourceLine::before { text-decoration: underline; }
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
 }
 code span.al { color: #ff0000; font-weight: bold; } /* Alert */
 code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
@@ -318,89 +333,113 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 
 <h1 class="title toc-ignore">mashr with common baseline at mean</h1>
 <h4 class="author">Yuxin Zou</h4>
-<h4 class="date">2022-01-24</h4>
+<h4 class="date">2022-12-07</h4>
 
 
 
-<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb1-1" data-line-number="1"><span class="kw">library</span>(MASS)</a>
-<a class="sourceLine" id="cb1-2" data-line-number="2"><span class="kw">library</span>(kableExtra)</a></code></pre></div>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(MASS)</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(kableExtra)</span></code></pre></div>
 <div id="introduction" class="section level1">
 <h1>Introduction</h1>
-<p>In the previous vignette <a href="intro_mashcommonbaseline.html">mash common baseline</a>, we estimate the change in some quantity computed in multiple conditions over a <strong>common control</strong> condition. However, there might be <strong>no common control</strong> condition in a study. In this case, we define the reference condition as the <strong>mean</strong> over different conditions. Deviation in any condition is defined as a difference in the quantity over the mean. We want to estimate the change in some quantity computed in multiple conditions over their mean.</p>
-<p>For example, we measure the gene expression under multiple conditions. We want to estimate the change in expression in multiple conditions over their mean.</p>
-<p>As in the mash common baseline vignette, we include the additional burden of comparing all conditions to the same reference condition. To deal with these additional correlations, mashr allows the user to specify the reference condition using <code>mash_update_data</code> with <code>ref = 'mean'</code>, after setting up the data in <code>mash_set_data</code>.</p>
+<p>In the previous vignette <a href="intro_mashcommonbaseline.html">mash
+common baseline</a>, we estimate the change in some quantity computed in
+multiple conditions over a <strong>common control</strong> condition.
+However, there might be <strong>no common control</strong> condition in
+a study. In this case, we define the reference condition as the
+<strong>mean</strong> over different conditions. Deviation in any
+condition is defined as a difference in the quantity over the mean. We
+want to estimate the change in some quantity computed in multiple
+conditions over their mean.</p>
+<p>For example, we measure the gene expression under multiple
+conditions. We want to estimate the change in expression in multiple
+conditions over their mean.</p>
+<p>As in the mash common baseline vignette, we include the additional
+burden of comparing all conditions to the same reference condition. To
+deal with these additional correlations, mashr allows the user to
+specify the reference condition using <code>mash_update_data</code> with
+<code>ref = &#39;mean&#39;</code>, after setting up the data in
+<code>mash_set_data</code>.</p>
 </div>
 <div id="illustration" class="section level1">
 <h1>Illustration</h1>
-<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb2-1" data-line-number="1">generate_data =<span class="st"> </span><span class="cf">function</span>(n, p, V, Utrue, <span class="dt">err_sd=</span><span class="fl">0.01</span>, <span class="dt">pi=</span><span class="ot">NULL</span>){</a>
-<a class="sourceLine" id="cb2-2" data-line-number="2">  <span class="cf">if</span> (<span class="kw">is.null</span>(pi)) {</a>
-<a class="sourceLine" id="cb2-3" data-line-number="3">    pi =<span class="st"> </span><span class="kw">rep</span>(<span class="dv">1</span>, <span class="kw">length</span>(Utrue)) <span class="co"># default to uniform distribution</span></a>
-<a class="sourceLine" id="cb2-4" data-line-number="4">  }</a>
-<a class="sourceLine" id="cb2-5" data-line-number="5">  assertthat<span class="op">::</span><span class="kw">are_equal</span>(<span class="kw">length</span>(pi), <span class="kw">length</span>(Utrue))</a>
-<a class="sourceLine" id="cb2-6" data-line-number="6"></a>
-<a class="sourceLine" id="cb2-7" data-line-number="7">  <span class="cf">for</span> (j <span class="cf">in</span> <span class="dv">1</span><span class="op">:</span><span class="kw">length</span>(Utrue)) {</a>
-<a class="sourceLine" id="cb2-8" data-line-number="8">    assertthat<span class="op">::</span><span class="kw">are_equal</span>(<span class="kw">dim</span>(Utrue[j]), <span class="kw">c</span>(p, p))</a>
-<a class="sourceLine" id="cb2-9" data-line-number="9">  }</a>
-<a class="sourceLine" id="cb2-10" data-line-number="10"></a>
-<a class="sourceLine" id="cb2-11" data-line-number="11">  pi &lt;-<span class="st"> </span>pi <span class="op">/</span><span class="st"> </span><span class="kw">sum</span>(pi) <span class="co"># normalize pi to sum to one</span></a>
-<a class="sourceLine" id="cb2-12" data-line-number="12">  which_U &lt;-<span class="st"> </span><span class="kw">sample</span>(<span class="dv">1</span><span class="op">:</span><span class="kw">length</span>(pi), n, <span class="dt">replace=</span><span class="ot">TRUE</span>, <span class="dt">prob=</span>pi)</a>
-<a class="sourceLine" id="cb2-13" data-line-number="13"></a>
-<a class="sourceLine" id="cb2-14" data-line-number="14">  Beta =<span class="st"> </span><span class="kw">matrix</span>(<span class="dv">0</span>, <span class="dt">nrow=</span>n, <span class="dt">ncol=</span>p)</a>
-<a class="sourceLine" id="cb2-15" data-line-number="15">  <span class="cf">for</span>(i <span class="cf">in</span> <span class="dv">1</span><span class="op">:</span>n){</a>
-<a class="sourceLine" id="cb2-16" data-line-number="16">    Beta[i,] =<span class="st"> </span><span class="kw">mvrnorm</span>(<span class="dv">1</span>, <span class="kw">rep</span>(<span class="dv">0</span>, p), Utrue[[which_U[i]]])</a>
-<a class="sourceLine" id="cb2-17" data-line-number="17">  }</a>
-<a class="sourceLine" id="cb2-18" data-line-number="18">  Shat =<span class="st"> </span><span class="kw">matrix</span>(err_sd, <span class="dt">nrow=</span>n, <span class="dt">ncol=</span>p, <span class="dt">byrow =</span> <span class="ot">TRUE</span>)</a>
-<a class="sourceLine" id="cb2-19" data-line-number="19">  E =<span class="st"> </span><span class="kw">mvrnorm</span>(n, <span class="kw">rep</span>(<span class="dv">0</span>, p), Shat[<span class="dv">1</span>,]<span class="op">^</span><span class="dv">2</span> <span class="op">*</span><span class="st"> </span>V)</a>
-<a class="sourceLine" id="cb2-20" data-line-number="20">  Bhat =<span class="st"> </span>Beta <span class="op">+</span><span class="st"> </span>E</a>
-<a class="sourceLine" id="cb2-21" data-line-number="21">  <span class="kw">return</span>(<span class="kw">list</span>(<span class="dt">B =</span> Beta, <span class="dt">Bhat=</span>Bhat, <span class="dt">Shat =</span> Shat, <span class="dt">whichU =</span> which_U))</a>
-<a class="sourceLine" id="cb2-22" data-line-number="22">}</a></code></pre></div>
-<p>Here we simulate data for illustration. This simulation routine creates a dataset with 5 conditions and 2000 samples. Half of the samples have equal expression among conditions. In the rest samples, half have higher and equal expression in the first 2 conditions, half have higher expression in the last condition.</p>
-<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb3-1" data-line-number="1"><span class="kw">set.seed</span>(<span class="dv">1</span>)</a>
-<a class="sourceLine" id="cb3-2" data-line-number="2">n =<span class="st"> </span><span class="dv">2000</span></a>
-<a class="sourceLine" id="cb3-3" data-line-number="3">R =<span class="st"> </span><span class="dv">5</span></a>
-<a class="sourceLine" id="cb3-4" data-line-number="4">V =<span class="st"> </span><span class="kw">diag</span>(R)</a>
-<a class="sourceLine" id="cb3-5" data-line-number="5">U0 =<span class="st"> </span><span class="kw">matrix</span>(<span class="dv">0</span>, R, R)</a>
-<a class="sourceLine" id="cb3-6" data-line-number="6">U1 =<span class="st"> </span><span class="kw">matrix</span>(<span class="dv">1</span>, R, R)</a>
-<a class="sourceLine" id="cb3-7" data-line-number="7">U2 =<span class="st"> </span>U0; U2[<span class="dv">1</span><span class="op">:</span><span class="dv">2</span>,<span class="dv">1</span><span class="op">:</span><span class="dv">2</span>] =<span class="st"> </span><span class="dv">4</span></a>
-<a class="sourceLine" id="cb3-8" data-line-number="8">U3 =<span class="st"> </span>U0; U3[<span class="dv">5</span>,<span class="dv">5</span>] =<span class="st"> </span><span class="dv">4</span></a>
-<a class="sourceLine" id="cb3-9" data-line-number="9">simdata =<span class="st"> </span><span class="kw">generate_data</span>(n, R, V, <span class="kw">list</span>(<span class="dt">U0=</span>U0, <span class="dt">U1=</span>U1, <span class="dt">U2=</span>U2, <span class="dt">U3 =</span> U3), <span class="dt">err_sd =</span> <span class="dv">1</span>)</a></code></pre></div>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>generate_data <span class="ot">=</span> <span class="cf">function</span>(n, p, V, Utrue, <span class="at">err_sd=</span><span class="fl">0.01</span>, <span class="at">pi=</span><span class="cn">NULL</span>){</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> (<span class="fu">is.null</span>(pi)) {</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>    pi <span class="ot">=</span> <span class="fu">rep</span>(<span class="dv">1</span>, <span class="fu">length</span>(Utrue)) <span class="co"># default to uniform distribution</span></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>  assertthat<span class="sc">::</span><span class="fu">are_equal</span>(<span class="fu">length</span>(pi), <span class="fu">length</span>(Utrue))</span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>  <span class="cf">for</span> (j <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span><span class="fu">length</span>(Utrue)) {</span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>    assertthat<span class="sc">::</span><span class="fu">are_equal</span>(<span class="fu">dim</span>(Utrue[j]), <span class="fu">c</span>(p, p))</span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a>  pi <span class="ot">&lt;-</span> pi <span class="sc">/</span> <span class="fu">sum</span>(pi) <span class="co"># normalize pi to sum to one</span></span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a>  which_U <span class="ot">&lt;-</span> <span class="fu">sample</span>(<span class="dv">1</span><span class="sc">:</span><span class="fu">length</span>(pi), n, <span class="at">replace=</span><span class="cn">TRUE</span>, <span class="at">prob=</span>pi)</span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a>  Beta <span class="ot">=</span> <span class="fu">matrix</span>(<span class="dv">0</span>, <span class="at">nrow=</span>n, <span class="at">ncol=</span>p)</span>
+<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a>  <span class="cf">for</span>(i <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span>n){</span>
+<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a>    Beta[i,] <span class="ot">=</span> <span class="fu">mvrnorm</span>(<span class="dv">1</span>, <span class="fu">rep</span>(<span class="dv">0</span>, p), Utrue[[which_U[i]]])</span>
+<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a>  Shat <span class="ot">=</span> <span class="fu">matrix</span>(err_sd, <span class="at">nrow=</span>n, <span class="at">ncol=</span>p, <span class="at">byrow =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb2-19"><a href="#cb2-19" aria-hidden="true" tabindex="-1"></a>  E <span class="ot">=</span> <span class="fu">mvrnorm</span>(n, <span class="fu">rep</span>(<span class="dv">0</span>, p), Shat[<span class="dv">1</span>,]<span class="sc">^</span><span class="dv">2</span> <span class="sc">*</span> V)</span>
+<span id="cb2-20"><a href="#cb2-20" aria-hidden="true" tabindex="-1"></a>  Bhat <span class="ot">=</span> Beta <span class="sc">+</span> E</span>
+<span id="cb2-21"><a href="#cb2-21" aria-hidden="true" tabindex="-1"></a>  <span class="fu">return</span>(<span class="fu">list</span>(<span class="at">B =</span> Beta, <span class="at">Bhat=</span>Bhat, <span class="at">Shat =</span> Shat, <span class="at">whichU =</span> which_U))</span>
+<span id="cb2-22"><a href="#cb2-22" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div>
+<p>Here we simulate data for illustration. This simulation routine
+creates a dataset with 5 conditions and 2000 samples. Half of the
+samples have equal expression among conditions. In the rest samples,
+half have higher and equal expression in the first 2 conditions, half
+have higher expression in the last condition.</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">1</span>)</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>n <span class="ot">=</span> <span class="dv">2000</span></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>R <span class="ot">=</span> <span class="dv">5</span></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>V <span class="ot">=</span> <span class="fu">diag</span>(R)</span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>U0 <span class="ot">=</span> <span class="fu">matrix</span>(<span class="dv">0</span>, R, R)</span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>U1 <span class="ot">=</span> <span class="fu">matrix</span>(<span class="dv">1</span>, R, R)</span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>U2 <span class="ot">=</span> U0; U2[<span class="dv">1</span><span class="sc">:</span><span class="dv">2</span>,<span class="dv">1</span><span class="sc">:</span><span class="dv">2</span>] <span class="ot">=</span> <span class="dv">4</span></span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>U3 <span class="ot">=</span> U0; U3[<span class="dv">5</span>,<span class="dv">5</span>] <span class="ot">=</span> <span class="dv">4</span></span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>simdata <span class="ot">=</span> <span class="fu">generate_data</span>(n, R, V, <span class="fu">list</span>(<span class="at">U0=</span>U0, <span class="at">U1=</span>U1, <span class="at">U2=</span>U2, <span class="at">U3 =</span> U3), <span class="at">err_sd =</span> <span class="dv">1</span>)</span></code></pre></div>
 <ol style="list-style-type: decimal">
 <li>Read in the data, and set the reference condition as mean</li>
 </ol>
-<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb4-1" data-line-number="1"><span class="kw">library</span>(mashr)</a>
-<a class="sourceLine" id="cb4-2" data-line-number="2">data =<span class="st"> </span><span class="kw">mash_set_data</span>(simdata<span class="op">$</span>Bhat, simdata<span class="op">$</span>Shat)</a>
-<a class="sourceLine" id="cb4-3" data-line-number="3"></a>
-<a class="sourceLine" id="cb4-4" data-line-number="4">data.L =<span class="st"> </span><span class="kw">mash_update_data</span>(data, <span class="dt">ref =</span> <span class="st">'mean'</span>)</a></code></pre></div>
-<p>The updated mash data object (data.L) includes the induced correlation internally.</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(mashr)</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>data <span class="ot">=</span> <span class="fu">mash_set_data</span>(simdata<span class="sc">$</span>Bhat, simdata<span class="sc">$</span>Shat)</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>data.L <span class="ot">=</span> <span class="fu">mash_update_data</span>(data, <span class="at">ref =</span> <span class="st">&#39;mean&#39;</span>)</span></code></pre></div>
+<p>The updated mash data object (data.L) includes the induced
+correlation internally.</p>
 <ol start="2" style="list-style-type: decimal">
-<li>We proceed the analysis using the simple canonical covariances as in the <a href="intro_mash.html">initial introductory</a> vignette, and the data driven covariances as in the <a href="intro_mash_dd.html">Introduction to mash: data-driven covariances</a>.</li>
+<li>We proceed the analysis using the simple canonical covariances as in
+the <a href="intro_mash.html">initial introductory</a> vignette, and the
+data driven covariances as in the <a href="intro_mash_dd.html">Introduction to mash: data-driven
+covariances</a>.</li>
 </ol>
 <ul>
 <li>Canonical covariances</li>
 </ul>
-<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb5-1" data-line-number="1">U.c =<span class="st"> </span><span class="kw">cov_canonical</span>(data.L)</a></code></pre></div>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>U.c <span class="ot">=</span> <span class="fu">cov_canonical</span>(data.L)</span></code></pre></div>
 <ul>
 <li>Data-driven covariances</li>
 </ul>
-<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb6-1" data-line-number="1">m<span class="fl">.1</span>by1 =<span class="st"> </span><span class="kw">mash_1by1</span>(data.L)</a>
-<a class="sourceLine" id="cb6-2" data-line-number="2">strong =<span class="st"> </span><span class="kw">get_significant_results</span>(m<span class="fl">.1</span>by1)</a>
-<a class="sourceLine" id="cb6-3" data-line-number="3">U.pca =<span class="st"> </span><span class="kw">cov_pca</span>(data.L,<span class="dv">2</span>,<span class="dt">subset=</span>strong)</a>
-<a class="sourceLine" id="cb6-4" data-line-number="4">U.ed =<span class="st"> </span><span class="kw">cov_ed</span>(data.L, U.pca, <span class="dt">subset=</span>strong)</a></code></pre></div>
+<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>m<span class="fl">.1</span>by1 <span class="ot">=</span> <span class="fu">mash_1by1</span>(data.L)</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>strong <span class="ot">=</span> <span class="fu">get_significant_results</span>(m<span class="fl">.1</span>by1)</span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>U.pca <span class="ot">=</span> <span class="fu">cov_pca</span>(data.L,<span class="dv">2</span>,<span class="at">subset=</span>strong)</span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>U.ed <span class="ot">=</span> <span class="fu">cov_ed</span>(data.L, U.pca, <span class="at">subset=</span>strong)</span></code></pre></div>
 <ol start="3" style="list-style-type: decimal">
 <li>Fit mash model</li>
 </ol>
-<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb7-1" data-line-number="1">m =<span class="st"> </span><span class="kw">mash</span>(data.L, <span class="kw">c</span>(U.c,U.ed), <span class="dt">algorithm.version =</span> <span class="st">'R'</span>)</a></code></pre></div>
+<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>m <span class="ot">=</span> <span class="fu">mash</span>(data.L, <span class="fu">c</span>(U.c,U.ed), <span class="at">algorithm.version =</span> <span class="st">&#39;R&#39;</span>)</span></code></pre></div>
 <pre><code>#  - Computing 2000 x 181 likelihood matrix.
-#  - Likelihood calculations took 0.11 seconds.
+#  - Likelihood calculations took 0.12 seconds.
 #  - Fitting model with 181 mixture components.
-#  - Model fitting took 0.96 seconds.
+#  - Model fitting took 0.91 seconds.
 #  - Computing posterior matrices.
 #  - Computation allocated took 0.02 seconds.</code></pre>
 <p>The log likelihood is</p>
-<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb9-1" data-line-number="1"><span class="kw">print</span>(<span class="kw">get_loglik</span>(m),<span class="dt">digits=</span><span class="dv">10</span>)</a></code></pre></div>
+<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(<span class="fu">get_loglik</span>(m),<span class="at">digits=</span><span class="dv">10</span>)</span></code></pre></div>
 <pre><code># [1] -10893.2688</code></pre>
-<p>Use <code>get_significant_results</code> to find the indices of effects that are ‘significant’:</p>
-<div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb11-1" data-line-number="1"><span class="kw">length</span>(<span class="kw">get_significant_results</span>(m))</a></code></pre></div>
+<p>Use <code>get_significant_results</code> to find the indices of
+effects that are ‘significant’:</p>
+<div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="fu">length</span>(<span class="fu">get_significant_results</span>(m))</span></code></pre></div>
 <pre><code># [1] 139</code></pre>
 <p>The number of false positive is 1.</p>
 </div>

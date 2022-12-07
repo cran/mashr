@@ -12,10 +12,23 @@
 
 <meta name="author" content="Yuxin Zou" />
 
-<meta name="date" content="2022-01-24" />
+<meta name="date" content="2022-12-07" />
 
 <title>mashr with common baseline</title>
 
+<script>// Pandoc 2.9 adds attributes on both header and div. We remove the former (to
+// be compatible with the behavior of Pandoc < 2.8).
+document.addEventListener('DOMContentLoaded', function(e) {
+  var hs = document.querySelectorAll("div.section[class*='level'] > :first-child");
+  var i, h, a;
+  for (i = 0; i < hs.length; i++) {
+    h = hs[i];
+    if (!/^h[1-6]$/i.test(h.tagName)) continue;  // it should be a header h1-h6
+    a = h.attributes;
+    while (a.length > 0) h.removeAttribute(a[0].name);
+  }
+});
+</script>
 
 <style type="text/css">
   code{white-space: pre-wrap;}
@@ -36,26 +49,28 @@
   }
 </style>
 <style type="text/css" data-origin="pandoc">
-a.sourceLine { display: inline-block; line-height: 1.25; }
-a.sourceLine { pointer-events: none; color: inherit; text-decoration: inherit; }
-a.sourceLine:empty { height: 1.2em; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
 .sourceCode { overflow: visible; }
-code.sourceCode { white-space: pre; position: relative; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
 div.sourceCode { margin: 1em 0; }
 pre.sourceCode { margin: 0; }
 @media screen {
 div.sourceCode { overflow: auto; }
 }
 @media print {
-code.sourceCode { white-space: pre-wrap; }
-a.sourceLine { text-indent: -1em; padding-left: 1em; }
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
 }
-pre.numberSource a.sourceLine
-  { position: relative; left: -4em; }
-pre.numberSource a.sourceLine::before
-  { content: attr(data-line-number);
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
     position: relative; left: -1em; text-align: right; vertical-align: baseline;
-    border: none; pointer-events: all; display: inline-block;
+    border: none; display: inline-block;
     -webkit-touch-callout: none; -webkit-user-select: none;
     -khtml-user-select: none; -moz-user-select: none;
     -ms-user-select: none; user-select: none;
@@ -64,9 +79,9 @@ pre.numberSource a.sourceLine::before
   }
 pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
 div.sourceCode
-  {  }
+  {   }
 @media screen {
-a.sourceLine::before { text-decoration: underline; }
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
 }
 code span.al { color: #ff0000; font-weight: bold; } /* Alert */
 code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
@@ -318,66 +333,106 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 
 <h1 class="title toc-ignore">mashr with common baseline</h1>
 <h4 class="author">Yuxin Zou</h4>
-<h4 class="date">2022-01-24</h4>
+<h4 class="date">2022-12-07</h4>
 
 
 
 <div id="introduction" class="section level1">
 <h1>Introduction</h1>
-<p>This vignette illustrates how to use <code>mashr</code> to estimate the change in some quantity measured in multiple conditions compared with a <strong>common</strong> control condition.</p>
-<p>We assume that we have measurements in multiple conditions, and want to estimate the deviation in each condition from the control: that is, the difference in mean between that condition and the control condition. When we compare every condition to the same control then the observed deviations are correlated with one another (even under the null where there are no true differences among conditions). These correlations, if not properly accounted for, can lead to many false positives in a multivariate analysis. This vignette illustrates how to properly account for such correlations.</p>
-<p>Here is the <a href="https://stephenslab.github.io/mashr/articles/MASH_baseline.pdf">write-up</a> for the details of the/ model. When there is no control condition in the study, we can compare the quantity in different conditions with the mean. We illustrate an example in the <a href="intro_mashbaselinemean.html">common baseline at the mean vignette</a>.</p>
-<p>To deal with these correlations, mashr allows the user to specify the reference condition using <code>mash_update_data</code>, after setting up the data in <code>mash_set_data</code>.</p>
-<p><strong>Note</strong>: The correlations in deviations induced by comparing to a common baseline/control occur even if the measurements in different conditions are entirely independent. If the measurements in different conditions are also correlated with one another (eg in eQTL applications this can occur due to sample overlap among the different conditions) then this induces additional correlations into the analysis that should also be taken into account. In <code>common baseline</code> analysis, such additional correlations can be specified by the user (we have not yet implemented methods to estimate this additional correlation from the data).</p>
+<p>This vignette illustrates how to use <code>mashr</code> to estimate
+the change in some quantity measured in multiple conditions compared
+with a <strong>common</strong> control condition.</p>
+<p>We assume that we have measurements in multiple conditions, and want
+to estimate the deviation in each condition from the control: that is,
+the difference in mean between that condition and the control condition.
+When we compare every condition to the same control then the observed
+deviations are correlated with one another (even under the null where
+there are no true differences among conditions). These correlations, if
+not properly accounted for, can lead to many false positives in a
+multivariate analysis. This vignette illustrates how to properly account
+for such correlations.</p>
+<p>Here is the <a href="https://stephenslab.github.io/mashr/articles/MASH_baseline.pdf">write-up</a>
+for the details of the/ model. When there is no control condition in the
+study, we can compare the quantity in different conditions with the
+mean. We illustrate an example in the <a href="intro_mashbaselinemean.html">common baseline at the mean
+vignette</a>.</p>
+<p>To deal with these correlations, mashr allows the user to specify the
+reference condition using <code>mash_update_data</code>, after setting
+up the data in <code>mash_set_data</code>.</p>
+<p><strong>Note</strong>: The correlations in deviations induced by
+comparing to a common baseline/control occur even if the measurements in
+different conditions are entirely independent. If the measurements in
+different conditions are also correlated with one another (eg in eQTL
+applications this can occur due to sample overlap among the different
+conditions) then this induces additional correlations into the analysis
+that should also be taken into account. In <code>common baseline</code>
+analysis, such additional correlations can be specified by the user (we
+have not yet implemented methods to estimate this additional correlation
+from the data).</p>
 </div>
 <div id="illustration" class="section level1">
 <h1>Illustration</h1>
-<p>Here we simulate data for illustration. This simulation routine creates a dataset with 8 conditions and 12000 samples, the last condition is the control condition. 90% of the samples have no deviations from the control condition. The remaining 10% of the samples are “non-null”, and consist of equal numbers of three different types of deviations: equal among conditions <span class="math inline">\(1, \cdots, 7\)</span>, present only in condition 1, independent across conditions <span class="math inline">\(1, \cdots, 7\)</span>.</p>
-<p>Our goal is to estimate the deviations in condition <span class="math inline">\(1, \cdots, 7\)</span> compared with the control condition.</p>
-<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb1-1" data-line-number="1"><span class="kw">library</span>(mashr)</a>
-<a class="sourceLine" id="cb1-2" data-line-number="2"><span class="kw">set.seed</span>(<span class="dv">1</span>)</a>
-<a class="sourceLine" id="cb1-3" data-line-number="3">simdata =<span class="st"> </span><span class="kw">sim_contrast2</span>(<span class="dt">nsamp =</span> <span class="dv">12000</span>, <span class="dt">ncond =</span> <span class="dv">8</span>)</a></code></pre></div>
+<p>Here we simulate data for illustration. This simulation routine
+creates a dataset with 8 conditions and 12000 samples, the last
+condition is the control condition. 90% of the samples have no
+deviations from the control condition. The remaining 10% of the samples
+are “non-null”, and consist of equal numbers of three different types of
+deviations: equal among conditions <span class="math inline">\(1,
+\cdots, 7\)</span>, present only in condition 1, independent across
+conditions <span class="math inline">\(1, \cdots, 7\)</span>.</p>
+<p>Our goal is to estimate the deviations in condition <span class="math inline">\(1, \cdots, 7\)</span> compared with the control
+condition.</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(mashr)</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">1</span>)</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>simdata <span class="ot">=</span> <span class="fu">sim_contrast2</span>(<span class="at">nsamp =</span> <span class="dv">12000</span>, <span class="at">ncond =</span> <span class="dv">8</span>)</span></code></pre></div>
 <p>We demonstrate the right way and the wrong to do the analysis</p>
 </div>
 <div id="the-right-way" class="section level1">
 <h1>The right way</h1>
 <p>Read in the data, and set the control condition</p>
-<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb2-1" data-line-number="1">data =<span class="st"> </span><span class="kw">mash_set_data</span>(simdata<span class="op">$</span>Chat, simdata<span class="op">$</span>Shat)</a>
-<a class="sourceLine" id="cb2-2" data-line-number="2"></a>
-<a class="sourceLine" id="cb2-3" data-line-number="3">data.L =<span class="st"> </span><span class="kw">mash_update_data</span>(data, <span class="dt">ref =</span> <span class="dv">8</span>)</a></code></pre></div>
-<p>The updated mash data object (<code>data.L</code>) includes the induced correlation internally.</p>
-<p>We proceed the analysis using just the simple canonical covariances as in the <a href="intro_mash.html">initial introductory</a> vignette.</p>
-<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb3-1" data-line-number="1">U.c =<span class="st"> </span><span class="kw">cov_canonical</span>(data.L)</a>
-<a class="sourceLine" id="cb3-2" data-line-number="2">mashcontrast.model =<span class="st"> </span><span class="kw">mash</span>(data.L, U.c, <span class="dt">algorithm.version =</span> <span class="st">'R'</span>)</a></code></pre></div>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>data <span class="ot">=</span> <span class="fu">mash_set_data</span>(simdata<span class="sc">$</span>Chat, simdata<span class="sc">$</span>Shat)</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>data.L <span class="ot">=</span> <span class="fu">mash_update_data</span>(data, <span class="at">ref =</span> <span class="dv">8</span>)</span></code></pre></div>
+<p>The updated mash data object (<code>data.L</code>) includes the
+induced correlation internally.</p>
+<p>We proceed the analysis using just the simple canonical covariances
+as in the <a href="intro_mash.html">initial introductory</a>
+vignette.</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>U.c <span class="ot">=</span> <span class="fu">cov_canonical</span>(data.L)</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>mashcontrast.model <span class="ot">=</span> <span class="fu">mash</span>(data.L, U.c, <span class="at">algorithm.version =</span> <span class="st">&#39;R&#39;</span>)</span></code></pre></div>
 <pre><code>#  - Computing 12000 x 181 likelihood matrix.
-#  - Likelihood calculations took 0.94 seconds.
+#  - Likelihood calculations took 1.09 seconds.
 #  - Fitting model with 181 mixture components.
-#  - Model fitting took 5.87 seconds.
+#  - Model fitting took 5.56 seconds.
 #  - Computing posterior matrices.
-#  - Computation allocated took 0.16 seconds.</code></pre>
-<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb5-1" data-line-number="1"><span class="kw">print</span>(<span class="kw">get_loglik</span>(mashcontrast.model),<span class="dt">digits=</span><span class="dv">10</span>)</a></code></pre></div>
+#  - Computation allocated took 0.17 seconds.</code></pre>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(<span class="fu">get_loglik</span>(mashcontrast.model),<span class="at">digits=</span><span class="dv">10</span>)</span></code></pre></div>
 <pre><code># [1] -105525.1372</code></pre>
-<p>Use <code>get_significant_results</code> to find the indices of effects that are ‘significant’:</p>
-<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb7-1" data-line-number="1"><span class="kw">length</span>(<span class="kw">get_significant_results</span>(mashcontrast.model))</a></code></pre></div>
+<p>Use <code>get_significant_results</code> to find the indices of
+effects that are ‘significant’:</p>
+<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="fu">length</span>(<span class="fu">get_significant_results</span>(mashcontrast.model))</span></code></pre></div>
 <pre><code># [1] 58</code></pre>
 <p>The number of false positive is 1.</p>
 </div>
 <div id="the-wrong-way" class="section level1">
 <h1>The wrong way</h1>
 <p>We fit the mash model ignoring the induced correlation.</p>
-<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb9-1" data-line-number="1">L =<span class="st"> </span><span class="kw">contrast_matrix</span>(<span class="dv">8</span>, <span class="dt">ref=</span><span class="dv">8</span>)</a>
-<a class="sourceLine" id="cb9-2" data-line-number="2">data.wrong =<span class="st"> </span><span class="kw">mash_set_data</span>(<span class="dt">Bhat =</span> simdata<span class="op">$</span>Chat <span class="op">%*%</span><span class="st"> </span><span class="kw">t</span>(L), <span class="dt">Shat =</span> <span class="dv">1</span>)</a>
-<a class="sourceLine" id="cb9-3" data-line-number="3">m =<span class="st"> </span><span class="kw">mash</span>(data.wrong, U.c)</a></code></pre></div>
+<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>L <span class="ot">=</span> <span class="fu">contrast_matrix</span>(<span class="dv">8</span>, <span class="at">ref=</span><span class="dv">8</span>)</span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>data.wrong <span class="ot">=</span> <span class="fu">mash_set_data</span>(<span class="at">Bhat =</span> simdata<span class="sc">$</span>Chat <span class="sc">%*%</span> <span class="fu">t</span>(L), <span class="at">Shat =</span> <span class="dv">1</span>)</span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>m <span class="ot">=</span> <span class="fu">mash</span>(data.wrong, U.c)</span></code></pre></div>
 <pre><code>#  - Computing 12000 x 181 likelihood matrix.
-#  - Likelihood calculations took 0.30 seconds.
+#  - Likelihood calculations took 0.31 seconds.
 #  - Fitting model with 181 mixture components.
-#  - Model fitting took 5.90 seconds.
+#  - Model fitting took 5.78 seconds.
 #  - Computing posterior matrices.
-#  - Computation allocated took 0.06 seconds.</code></pre>
-<div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb11-1" data-line-number="1"><span class="kw">print</span>(<span class="kw">get_loglik</span>(m),<span class="dt">digits =</span> <span class="dv">10</span>)</a></code></pre></div>
+#  - Computation allocated took 0.07 seconds.</code></pre>
+<div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(<span class="fu">get_loglik</span>(m),<span class="at">digits =</span> <span class="dv">10</span>)</span></code></pre></div>
 <pre><code># [1] -111355.197</code></pre>
-<p>We can see that the log likelihood is lower, since it does not consider the induced correlation.</p>
-<p>There are 3358 significant effects, 2932 of them are false positives. The number of false positives is much more than the one include the induced correlation.</p>
+<p>We can see that the log likelihood is lower, since it does not
+consider the induced correlation.</p>
+<p>There are 3358 significant effects, 2932 of them are false positives.
+The number of false positives is much more than the one include the
+induced correlation.</p>
 </div>
 
 
