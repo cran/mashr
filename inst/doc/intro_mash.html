@@ -12,7 +12,7 @@
 
 <meta name="author" content="Matthew Stephens" />
 
-<meta name="date" content="2022-12-07" />
+<meta name="date" content="2023-10-18" />
 
 <title>Introduction to mashr</title>
 
@@ -38,6 +38,7 @@ document.addEventListener('DOMContentLoaded', function(e) {
   div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
   ul.task-list{list-style: none;}
     </style>
+
 
 
 <style type="text/css">
@@ -121,13 +122,20 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
   for (var i = 0; i < sheets.length; i++) {
     if (sheets[i].ownerNode.dataset["origin"] !== "pandoc") continue;
     try { var rules = sheets[i].cssRules; } catch (e) { continue; }
-    for (var j = 0; j < rules.length; j++) {
+    var j = 0;
+    while (j < rules.length) {
       var rule = rules[j];
       // check if there is a div.sourceCode rule
-      if (rule.type !== rule.STYLE_RULE || rule.selectorText !== "div.sourceCode") continue;
+      if (rule.type !== rule.STYLE_RULE || rule.selectorText !== "div.sourceCode") {
+        j++;
+        continue;
+      }
       var style = rule.style.cssText;
       // check if color or background-color is set
-      if (rule.style.color === '' && rule.style.backgroundColor === '') continue;
+      if (rule.style.color === '' && rule.style.backgroundColor === '') {
+        j++;
+        continue;
+      }
       // replace div.sourceCode by a pre.sourceCode rule
       sheets[i].deleteRule(j);
       sheets[i].insertRule('pre.sourceCode{' + style + '}', j);
@@ -333,7 +341,7 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 
 <h1 class="title toc-ignore">Introduction to mashr</h1>
 <h4 class="author">Matthew Stephens</h4>
-<h4 class="date">2022-12-07</h4>
+<h4 class="date">2023-10-18</h4>
 
 
 
@@ -444,7 +452,7 @@ the model using the <code>mash</code> function:</p>
 <pre><code>#  - Computing 2000 x 151 likelihood matrix.
 #  - Likelihood calculations took 0.04 seconds.
 #  - Fitting model with 151 mixture components.
-#  - Model fitting took 0.58 seconds.
+#  - Model fitting took 0.54 seconds.
 #  - Computing posterior matrices.
 #  - Computation allocated took 0.02 seconds.</code></pre>
 <p>This can take a little time. What this does is to fit a mixture model
@@ -583,18 +591,18 @@ result.</p>
 # [1] stats     graphics  grDevices utils     datasets  methods   base     
 # 
 # other attached packages:
-# [1] mashr_0.2.69 ashr_2.2-54 
+# [1] mashr_0.2.79 ashr_2.2-57 
 # 
 # loaded via a namespace (and not attached):
 #  [1] Rcpp_1.0.8        knitr_1.37        magrittr_2.0.1    SQUAREM_2017.10-1
-#  [5] lattice_0.20-38   R6_2.4.1          rlang_0.4.11      fastmap_1.1.0    
+#  [5] lattice_0.20-38   R6_2.4.1          rlang_1.0.6       fastmap_1.1.0    
 #  [9] highr_0.8         plyr_1.8.5        stringr_1.4.0     tools_3.6.2      
-# [13] grid_3.6.2        xfun_0.29         rmeta_3.0         irlba_2.3.3      
-# [17] invgamma_1.1      jquerylib_0.1.4   htmltools_0.5.2   assertthat_0.2.1 
-# [21] abind_1.4-5       yaml_2.2.0        digest_0.6.23     mixsqp_0.3-46    
-# [25] Matrix_1.2-18     sass_0.4.0        evaluate_0.14     rmarkdown_2.11   
-# [29] stringi_1.4.3     compiler_3.6.2    bslib_0.3.1       mvtnorm_1.0-11   
-# [33] jsonlite_1.7.2    truncnorm_1.0-8</code></pre>
+# [13] grid_3.6.2        xfun_0.36         rmeta_3.0         irlba_2.3.3      
+# [17] cli_3.5.0         invgamma_1.1      jquerylib_0.1.4   htmltools_0.5.4  
+# [21] assertthat_0.2.1  abind_1.4-5       yaml_2.2.0        digest_0.6.23    
+# [25] mixsqp_0.3-48     Matrix_1.3-4      sass_0.4.0        evaluate_0.14    
+# [29] rmarkdown_2.21    stringi_1.4.3     compiler_3.6.2    bslib_0.3.1      
+# [33] mvtnorm_1.0-11    jsonlite_1.7.2    truncnorm_1.0-8</code></pre>
 </div>
 
 

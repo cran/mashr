@@ -12,7 +12,7 @@
 
 <meta name="author" content="Matthew Stephens" />
 
-<meta name="date" content="2022-12-07" />
+<meta name="date" content="2023-10-18" />
 
 <title>eQTL analysis outline</title>
 
@@ -38,6 +38,7 @@ document.addEventListener('DOMContentLoaded', function(e) {
   div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
   ul.task-list{list-style: none;}
     </style>
+
 
 
 <style type="text/css">
@@ -121,13 +122,20 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
   for (var i = 0; i < sheets.length; i++) {
     if (sheets[i].ownerNode.dataset["origin"] !== "pandoc") continue;
     try { var rules = sheets[i].cssRules; } catch (e) { continue; }
-    for (var j = 0; j < rules.length; j++) {
+    var j = 0;
+    while (j < rules.length) {
       var rule = rules[j];
       // check if there is a div.sourceCode rule
-      if (rule.type !== rule.STYLE_RULE || rule.selectorText !== "div.sourceCode") continue;
+      if (rule.type !== rule.STYLE_RULE || rule.selectorText !== "div.sourceCode") {
+        j++;
+        continue;
+      }
       var style = rule.style.cssText;
       // check if color or background-color is set
-      if (rule.style.color === '' && rule.style.backgroundColor === '') continue;
+      if (rule.style.color === '' && rule.style.backgroundColor === '') {
+        j++;
+        continue;
+      }
       // replace div.sourceCode by a pre.sourceCode rule
       sheets[i].deleteRule(j);
       sheets[i].insertRule('pre.sourceCode{' + style + '}', j);
@@ -333,7 +341,7 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 
 <h1 class="title toc-ignore">eQTL analysis outline</h1>
 <h4 class="author">Matthew Stephens</h4>
-<h4 class="date">2022-12-07</h4>
+<h4 class="date">2023-10-18</h4>
 
 
 
@@ -443,9 +451,9 @@ compute posterior summaries for these tests (which saves time).</p>
 <div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>U.c <span class="ot">=</span> <span class="fu">cov_canonical</span>(data.random)</span>
 <span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>m <span class="ot">=</span> <span class="fu">mash</span>(data.random, <span class="at">Ulist =</span> <span class="fu">c</span>(U.ed,U.c), <span class="at">outputlevel =</span> <span class="dv">1</span>)</span></code></pre></div>
 <pre><code>#  - Computing 5000 x 241 likelihood matrix.
-#  - Likelihood calculations took 0.16 seconds.
+#  - Likelihood calculations took 0.17 seconds.
 #  - Fitting model with 241 mixture components.
-#  - Model fitting took 3.67 seconds.</code></pre>
+#  - Model fitting took 3.49 seconds.</code></pre>
 </div>
 <div id="compute-posterior-summaries" class="section level2">
 <h2>Compute posterior summaries</h2>

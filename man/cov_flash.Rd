@@ -2,7 +2,7 @@
 % Please edit documentation in R/data2cov.R
 \name{cov_flash}
 \alias{cov_flash}
-\title{Perform Empirical Bayes Matrix Factorization using flashr, and
+\title{Perform Empirical Bayes Matrix Factorization using flashier, and
   return a list of candidate covariance matrices}
 \usage{
 cov_flash(
@@ -36,16 +36,16 @@ corresponding to singleton matrices will be removed from the output.}
 (using \code{\link{saveRDS}}).}
 
 \item{greedy_args}{List containing additional parameters passed to
-\code{flashier::flash.add.greedy}.}
+\code{flashier::flash_greedy}.}
 
 \item{backfit_args}{List containing additional parameters passed
-to \code{flashier::flash.backfit}.}
+to \code{flashier::flash_backfit}.}
 }
 \value{
 A list of covariance matrices.
 }
 \description{
-Perform Empirical Bayes Matrix Factorization using flashr, and
+Perform Empirical Bayes Matrix Factorization using flashier, and
   return a list of candidate covariance matrices
 }
 \examples{
